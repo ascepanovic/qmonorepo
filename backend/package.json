@@ -1,0 +1,38 @@
+{
+  "name": "quiz",
+  "version": "1.0.0",
+  "main": "app.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/app.ts",
+    "start": "node dist/app.js",
+    "build": "tsc -p .",
+    "db:migrate": "npx prisma migrate dev --name init",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.15",
+    "@types/jsonwebtoken": "^9.0.1",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^18.11.18",
+    "@types/passport": "^1.0.12",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.22",
+    "prisma": "^4.8.1",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^4.9.4",
+    "@types/passport-google-oauth20": "^2.0.11"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.8.1",
+    "axios": "^1.2.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "passport": "^0.6.0",
+    "passport-google-oauth20": "^2.0.0"
+  }
+}
