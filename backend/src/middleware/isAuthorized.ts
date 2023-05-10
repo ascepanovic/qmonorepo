@@ -10,7 +10,7 @@ export const isAuthorized = function (
   res: Response,
   next: NextFunction
 ) {
-  const token = req.header("Authorization");
+  const token = req.cookies.token;
 
   if (!token) {
     return res.status(401).send("Token missing");

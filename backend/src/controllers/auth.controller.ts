@@ -22,7 +22,13 @@ export const signInWithGoogle = async (req: Request, res: Response) => {
       };
       const user = await findOrCreate(data);
       const token = generateAccessToken(user);
-      return res.header("Authorization", token).json({ token }).status(200);
+      return res
+        .cookie("token", token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+        })
+        .status(200)
+        .json({ message: "Logged in successfully!" });
     }
   } catch (error) {
     console.log("ERROR GOOGLE LOGIN", error);
@@ -30,6 +36,13 @@ export const signInWithGoogle = async (req: Request, res: Response) => {
       error: "Google Login Failed",
     });
   }
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie("token");
+  return res.json({
+    message: "Logged out",
+  });
 };
 
 export const checkUser = (req: any, res: Response) => {
