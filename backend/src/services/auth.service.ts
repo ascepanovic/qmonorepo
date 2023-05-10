@@ -5,3 +5,9 @@ export function generateAccessToken(user: any): string {
     expiresIn: process.env.ACCESS_TOKEN_EXP_TIME,
   });
 }
+
+export const verifyToken = (token: string): any => {
+  const secret = `${process.env.ACCESS_TOKEN_KEY}`;
+  const user = jwt.verify(token, secret);
+  return user;
+};
