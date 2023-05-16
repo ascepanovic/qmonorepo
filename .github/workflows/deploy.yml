@@ -24,20 +24,20 @@ jobs:
           script: |
             cd /home/ubuntu/qmonorepo
             git pull origin dev
-            # Deploy Node.js backend
-            cd ./backend
-            npm install
-            pm2 restart 2
-            # Deploy React frontend
-            cd ../frontend
-            npm install
-            pm2 restart 1
-
-
-
-
-
-
-
-
-
+            if git diff --quiet HEAD^ HEAD -- backend/; then
+              echo "Deploy Node.js backend"
+              cd ./backend
+              npm install
+              pm2 restart 2
+              cd ..
+            else
+              echo "No changes in backend, skipping deployment"
+            fi
+            if git diff --quiet HEAD^ HEAD -- frontend/; then
+              echo "Deploy React frontend"
+              cd ./frontend
+              npm install
+              pm2 restart 1
+            else
+              echo "No changes in frontend, skipping deployment"
+            fi
