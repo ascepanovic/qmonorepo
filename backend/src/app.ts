@@ -3,9 +3,8 @@ import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { authRouter } from "./routes/auth.route";
-import { userRouter } from "./routes/user.route";
 import connectDB from "./utils/prisma";
+import routes from "./routes/routes";
 
 const app = express();
 
@@ -21,14 +20,11 @@ app.use(
     origin: [FRONTEND_ORIGIN],
   })
 );
-
-app.use("/auth", authRouter);
-app.use("/users", userRouter);
+app.use(routes);
 
 app.get("/healthcheck", (req: Request, res: Response) => {
   res.status(200).json({
-    status: "success",
-    message: "Success!!!",
+    message: "Success!",
   });
 });
 
