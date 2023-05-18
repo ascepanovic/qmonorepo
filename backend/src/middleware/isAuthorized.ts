@@ -1,18 +1,27 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import { verifyToken } from "../services/auth.service";
+
+interface AuthenticatedRequest extends Request {
+  user?: any;
+}
+
 export const isAuthorized = function (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) {
-  const accessToken = req.header("Authorization");
-  if (!accessToken) return res.status(400).send("Access denied. Invalid Token");
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).send("Token missing");
+  }
+
   try {
-    const decoded: any = jwt.verify(accessToken, process.env.ACCESS_TOKEN_KEY!);
-    req.user = decoded;
+    const user = verifyToken(token);
+    req.user = user;
     next();
-  } catch (ex) {
-    console.log("Exception", ex);
-    res.status(400).send("Invalid token");
+  } catch (err) {
+    console.error(err);
+    res.status(401).send("Invalid token");
   }
 };
