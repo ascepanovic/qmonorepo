@@ -20,14 +20,14 @@ module.exports = {
     "plugin:jsx-a11y/recommended",
     "plugin:prettier/recommended",
   ],
-  // parser: '@typescript-eslint/parser',
   parserOptions: {
     parser: "@typescript-eslint/parser",
     project: "./tsconfig.json",
     tsconfigRootDir: __dirname,
   },
-  plugins: ["react", "@typescript-eslint", "import", "@tanstack/query"],
+  plugins: ["react", "@typescript-eslint", "import"],
   rules: {
+    "@typescript-eslint/no-floating-promises": "off",
     "react/display-name": "off",
     "react/prop-types": "off",
 
@@ -69,7 +69,5 @@ module.exports = {
       { endOfLine: "auto" },
       { usePrettierrc: true },
     ],
-    "@tanstack/query/exhaustive-deps": "error",
-    "@tanstack/query/prefer-query-object-syntax": "error",
   },
 };
