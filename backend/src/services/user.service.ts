@@ -1,4 +1,3 @@
-import { User } from "@prisma/client";
 import { prisma } from "../utils/prisma"; // import your prisma instance
 
 export interface UserInterface {
@@ -38,4 +37,48 @@ export async function findOrCreate(user: any) {
 }
 export async function findAll() {
   return await prisma.user.findMany();
+}
+export async function findById(id: number) {
+  return await prisma.user.findUnique({
+    where: { id },
+  });
+}
+
+export async function create(user: any) {
+  return await prisma.user.create({
+    data: {
+      name: user.name,
+      email: user.email,
+      photo: user.photo,
+    },
+  });
+}
+
+export async function update(id: number, user: any) {
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!existingUser) {
+    return null;
+  }
+
+  return await prisma.user.update({
+    where: { id },
+    data: {
+      name: user.name,
+      photo: user.photo,
+    },
+  });
+}
+
+export async function deleteUser(id: number) {
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+  });
+  if (!existingUser) {
+    return null;
+  }
+  return await prisma.user.delete({
+    where: { id },
+  });
 }
