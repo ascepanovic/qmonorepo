@@ -3,17 +3,14 @@ import { BiLogOut } from "react-icons/bi";
 import { FaUserAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+import Placeholder from "@/assets/images/user_placeholder.png";
 import { ENDPOINTS } from "@/constants/Endpoints";
 import { useAuthContext } from "@/context";
 import { http } from "@/lib/axios";
-import { UserT } from "@/types";
 
-type UserProps = {
-  user: UserT;
-};
-
-export const User = ({ user }: UserProps) => {
+export const User = () => {
   const [menu, setMenu] = useState(false);
+  const { user } = useAuthContext();
   const { logout } = useAuthContext();
   const toggleMenu = () => setMenu((prev) => !prev);
 
@@ -22,20 +19,34 @@ export const User = ({ user }: UserProps) => {
     http(ENDPOINTS.AUTH.LOGOUT).then(logout);
   };
 
+  const handleError = (
+    event: React.SyntheticEvent<HTMLImageElement, Event>,
+  ) => {
+    (event.target as HTMLImageElement).src = Placeholder;
+  };
+
   return (
     <div className="relative">
       <button onClick={toggleMenu}>
-        {" "}
-        <img src={user.photo} alt="" className="h-12 rounded-full" />
+        <img
+          src={user?.photo}
+          onError={handleError}
+          alt=""
+          className="h-12 rounded-full"
+        />
       </button>
       <div
         className={`
           ${menu ? "scale-y-100" : ""}
-          transition-transform duration-250 ease-in-out scale-y-0 origin-top absolute top-[calc(100%+1rem)] right-0 bg-[white] rounded-lg p-4`}
+          duration-250 absolute right-0 top-[calc(100%+1rem)] z-10 origin-top scale-y-0 rounded-lg bg-[white] p-1 transition-transform ease-in-out`}
       >
-        <ul className="flex flex-col gap-4 uppercase text-xs w-max">
+        <ul className="flex w-max flex-col gap-1 text-xs uppercase">
           <li>
-            <Link className="flex gap-2" onClick={toggleMenu} to={"/profile"}>
+            <Link
+              className="flex gap-2 rounded-lg px-4 py-2 hover:bg-main-bg hover:text-main"
+              onClick={toggleMenu}
+              to={"/profile"}
+            >
               profile
               <span>
                 <FaUserAlt className="h-4 w-4" />
@@ -43,12 +54,16 @@ export const User = ({ user }: UserProps) => {
             </Link>
           </li>
           <li>
-            <button className="flex gap-2" onClick={logoutHandler}>
+            <Link
+              to="/"
+              className="flex gap-2 rounded-lg px-4 py-2 hover:bg-main-bg hover:text-main"
+              onClick={logoutHandler}
+            >
               logout
               <span>
                 <BiLogOut className="h-4 w-4" />
               </span>
-            </button>
+            </Link>
           </li>
         </ul>
       </div>

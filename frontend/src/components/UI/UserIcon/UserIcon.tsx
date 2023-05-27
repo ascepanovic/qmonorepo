@@ -14,7 +14,7 @@ export const UserIcon = () => {
     });
   };
 
-  if (user) return <User user={user} />;
+  if (user) return <User />;
   return (
     <GoogleLogin
       onSuccess={loginHandler}
