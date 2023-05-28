@@ -40,7 +40,7 @@ export const Profile = () => {
   ) => {
     (event.target as HTMLImageElement).src = Placeholder;
   };
-  if (!user) return;
+  if (!user) return <></>;
   return (
     <section className="relative mt-12 flex w-11/12 flex-col items-center gap-8 rounded-xl bg-gradient-to-r from-[#2C3E50] via-[#2AE78B] to-[#2C3E50] px-0 py-16 md:w-4/5 md:p-16">
       <img
