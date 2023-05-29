@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { MenuItem } from "../UI/MenuItem";
+import { Button } from "../UI/Button";
 import { NewGameModal, JoinGameModal } from "../UI/Modal";
 
 const CATEGORIES = [
@@ -11,11 +12,13 @@ const CATEGORIES = [
 ];
 
 export const Home = () => {
+  const navigate = useNavigate();
   const [newGame, setNewGame] = useState(false);
   const [joinGame, setJoinGame] = useState(false);
+
   const MENU_ITEMS = [
-    { title: "New Game", onClick: () => setNewGame((prev) => !prev) },
-    { title: "Join Game", onClick: () => setJoinGame((prev) => !prev) },
+    { text: "New Game", onClick: () => setNewGame((prev) => !prev) },
+    { text: "Join Game", onClick: () => setJoinGame((prev) => !prev) },
   ];
 
   return (
@@ -25,7 +28,7 @@ export const Home = () => {
     "
       >
         {MENU_ITEMS.map((e, i) => (
-          <MenuItem key={i} {...e} />
+          <Button key={i} {...e} className="px-16 py-10 text-2xl" />
         ))}
       </section>
       <NewGameModal
@@ -41,8 +44,8 @@ export const Home = () => {
         setVisibility={setJoinGame}
         visible={joinGame}
         submitHandler={(roomId) => {
-          console.log(roomId);
           setJoinGame(false);
+          navigate(`/room/${roomId}`);
         }}
       />
     </>
