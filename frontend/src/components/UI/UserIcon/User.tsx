@@ -3,7 +3,6 @@ import { BiLogOut } from "react-icons/bi";
 import { FaUserAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-import Placeholder from "@/assets/images/user_placeholder.png";
 import { ENDPOINTS } from "@/constants/Endpoints";
 import { useAuthContext } from "@/context";
 import { http } from "@/lib/axios";
@@ -19,18 +18,12 @@ export const User = () => {
     http(ENDPOINTS.AUTH.LOGOUT).then(logout);
   };
 
-  const handleError = (
-    event: React.SyntheticEvent<HTMLImageElement, Event>,
-  ) => {
-    (event.target as HTMLImageElement).src = Placeholder;
-  };
-
   return (
     <div className="relative">
       <button onClick={toggleMenu}>
         <img
+          referrerPolicy="no-referrer"
           src={user?.photo}
-          onError={handleError}
           alt=""
           className="h-12 rounded-full"
         />

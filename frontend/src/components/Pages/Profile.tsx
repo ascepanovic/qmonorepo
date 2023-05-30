@@ -6,7 +6,6 @@ import { SlClose } from "react-icons/sl";
 import { MatchHistory } from "../UI/MatchHistory";
 import { ProfileStats } from "../UI/ProfileStats";
 
-import Placeholder from "@/assets/images/user_placeholder.png";
 import { useAuthContext } from "@/context";
 
 const MOCK_STATS = [
@@ -35,17 +34,12 @@ const MOCK_STATS = [
 export const Profile = () => {
   const { user } = useAuthContext();
 
-  const handleError = (
-    event: React.SyntheticEvent<HTMLImageElement, Event>,
-  ) => {
-    (event.target as HTMLImageElement).src = Placeholder;
-  };
   if (!user) return <></>;
   return (
     <section className="relative mt-12 flex w-11/12 flex-col items-center gap-8 rounded-xl bg-gradient-to-r from-[#2C3E50] via-[#2AE78B] to-[#2C3E50] px-0 py-16 md:w-4/5 md:p-16">
       <img
+        referrerPolicy="no-referrer"
         src={user?.photo}
-        onError={handleError}
         alt="player"
         className="absolute left-1/2 top-0 h-24 -translate-x-1/2 -translate-y-1/2 rounded-full border-8 border-solid border-main-bg"
       />
