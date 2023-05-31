@@ -1,5 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -10,14 +8,82 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+
+
+model game_category {
+  id          Int      @id @default(autoincrement())
+  game_id     Int?
+  category_id Int?
+  games       games?    @relation(fields: [game_id], references: [id],onDelete: SetNull)
+  category    category? @relation(fields: [category_id], references: [id],onDelete: SetNull)
+}
+model answers {
+  id          Int       @id @default(autoincrement())
+  text        String
+  is_correct  Boolean
+  created_at  DateTime @default(now())
+  question_id Int
+  question    questions @relation(fields: [question_id], references: [id])
+}
+
+model questions {
+  id         Int               @id @default(autoincrement())
+  text       String
+  created_at DateTime          @default(now())
+  answers    answers[]
+  categories question_category[]
+}
+
+model question_category {
+  id          Int       @id @default(autoincrement())
+  category_id Int?       @map("category_id")
+  question_id Int?       @map("question_id")
+  category    category?  @relation(fields: [category_id], references: [id],onDelete:SetNull)
+  question    questions? @relation(fields: [question_id], references: [id],onDelete: SetNull)
+}
+
+model category {
+  id         Int        @id @default(autoincrement())
+  name       String
+  created_at DateTime   @default(now())
+  games      game_category[]
+  questions  question_category[]
+}
+
+
+
+model games {
+  id          Int             @id @default(autoincrement())
+  socket_id String
+  created_by  Int             @map("created_by")
+  created_at  DateTime @default(now())
+  game_users  games_by_user[]
+  categories  game_category[]
+}
+
+model games_by_user {
+  id          Int      @id @default(autoincrement())
+  game_id     Int?      @map("game_id")
+  user_id     Int?      @map("user_id")
+  points      Int      @default(0)
+  has_won     Boolean  @default(false)
+  created_at  DateTime @default(now())
+  user        users?    @relation(fields: [user_id], references: [id],onDelete: SetNull)
+  game        games?   @relation(fields: [game_id], references: [id],onDelete: SetNull)
+}
+model users {
   id       Int  @id @default(autoincrement())
   name     String
   email    String  @unique
   photo    String  @default("default.png")
-
+  role      Role     @default(USER)
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  @@map(name: "users")
+   games      games_by_user[]
+}
+
+enum Role {
+  USER
+  ADMIN
 }

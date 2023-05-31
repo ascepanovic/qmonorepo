@@ -8,7 +8,7 @@ import {
 } from "../services/user.service";
 import { handleResponseError } from "../utils/global";
 
-export const getAllUsers = async (req: Request, res: Response) => {
+export const getAllUsersController = async (req: Request, res: Response) => {
   try {
     const users = await findAll();
     return res.send(users).status(200);
@@ -17,7 +17,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserById = async (req: Request, res: Response) => {
+export const getUserByIdController = async (req: Request, res: Response) => {
   const userId: number = parseInt(req.params.id);
   try {
     const user = await findById(userId);
@@ -31,7 +31,7 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUserController = async (req: Request, res: Response) => {
   const { name, email, photo } = req.body;
 
   try {
@@ -43,7 +43,7 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserById = async (req: Request, res: Response) => {
+export const updateUserByIdController = async (req: Request, res: Response) => {
   const userId: number = parseInt(req.params.id);
 
   const { name, photo } = req.body;
@@ -65,7 +65,7 @@ export const updateUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUserById = async (req: Request, res: Response) => {
+export const deleteUserController = async (req: Request, res: Response) => {
   const userId: number = parseInt(req.params.id);
 
   try {

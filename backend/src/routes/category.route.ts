@@ -1,12 +1,12 @@
 import express from "express";
 import { isAuthorized } from "../middleware/isAuthorized";
 import {
-  createUserController,
-  deleteUserController,
-  getAllUsersController,
-  getUserByIdController,
-  updateUserByIdController,
-} from "../controllers/user.controller";
+  getAllCategoryController,
+  getCategoryByIdController,
+  createCategoryController,
+  updateCategoryController,
+  deleteCategoryController,
+} from "./../controllers/category.controller";
 
 const router = express.Router();
 
@@ -14,45 +14,45 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /user:
+ * /category:
  *   get:
- *     summary: Get all users
- *     tags: [User]
+ *     summary: Get all categories
+ *     tags: [Category]
  *     responses:
  *       200:
  *         description: Successful operation
  *       500:
- *         description: Error retrieving users
+ *         description: Error retrieving categories
  */
-router.get("/", getAllUsersController);
+router.get("/", getAllCategoryController);
 
 /**
  * @swagger
- * /user/{id}:
+ * /category/{id}:
  *   get:
- *     summary: Get a user by ID
- *     tags: [User]
+ *     summary: Get a category by ID
+ *     tags: [Category]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: User ID
+ *         description: category ID
  *     responses:
  *       200:
  *         description: Successful operation
  *       404:
- *         description: User not found
+ *         description: category not found
  */
-router.get("/:id", getUserByIdController);
+router.get("/:id", getCategoryByIdController);
 
 /**
  * @swagger
- * /user:
+ * /category:
  *   post:
- *     summary: Create a new user
- *     tags: [User]
+ *     summary: Create a new category
+ *     tags: [Category]
  *     requestBody:
  *       required: true
  *       content:
@@ -60,35 +60,29 @@ router.get("/:id", getUserByIdController);
  *           schema:
  *             type: object
  *             properties:
- *               email:
- *                 type: string
- *                 format: email
  *               name:
- *                 type: string
- *               photo:
  *                 type: string
  *     responses:
  *       201:
- *         description: User created successfully
+ *         description: category created successfully
  *       400:
- *         description: Invalid user data
+ *         description: Invalid category data
  */
-
-router.post("/", createUserController);
+router.post("/", createCategoryController);
 
 /**
  * @swagger
- * /user/{id}:
+ * /category/{id}:
  *   put:
- *     summary: Update a user by ID
- *     tags: [User]
+ *     summary: Update a category by ID
+ *     tags: [Category]
  *     parameters:
  *       - in: path
  *         name: id
  *         schema:
  *           type: string
  *         required: true
- *         description: ID of the user to update
+ *         description: ID of the category to update
  *     requestBody:
  *       required: true
  *       content:
@@ -98,38 +92,36 @@ router.post("/", createUserController);
  *             properties:
  *               name:
  *                 type: string
- *               photo:
- *                 type: string
  *     responses:
  *       200:
- *         description: User updated successfully
+ *         description: category updated successfully
  *       400:
- *         description: Invalid user data
+ *         description: Invalid category data
  *       404:
- *         description: User not found
+ *         description: category not found
  */
 
-router.put("/:id", updateUserByIdController);
+router.put("/:id", updateCategoryController);
 
 /**
  * @swagger
- * /user/{id}:
+ * /category/{id}:
  *   delete:
- *     summary: Delete a user by ID
- *     tags: [User]
+ *     summary: Delete a category by ID
+ *     tags: [Category]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: string
- *         description: User ID
+ *         description: category ID
  *     responses:
  *       200:
- *         description: User deleted successfully
+ *         description: category deleted successfully
  *       404:
- *         description: User not found
+ *         description: category not found
  */
-router.delete("/:id", deleteUserController);
+router.delete("/:id", deleteCategoryController);
 
-export { router as userRouter };
+export { router as categoryRouter };

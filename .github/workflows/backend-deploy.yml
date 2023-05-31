@@ -22,8 +22,10 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/qmonorepo
+            pm2 stop 2
             git restore backend/package-lock.json
             git pull
             cd ./backend
+            npm run db:migrate
             npm install
-            pm2 restart 2
+            pm2 start 2
