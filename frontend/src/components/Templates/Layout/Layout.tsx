@@ -1,11 +1,12 @@
-import { UserIcon } from "@/components/UI/UserIcon";
 import { Link, Outlet } from "react-router-dom";
+
+import { UserIcon } from "@/components/UI/UserIcon";
 
 export const Layout: React.FC = () => {
   return (
     <>
-      <div className="bg-main-bg h-[100vh] flex items-center flex-col">
-        <div className=" px-8 md:px-16 py-8 flex justify-between w-full">
+      <div className="flex min-h-screen flex-col items-center bg-main-bg">
+        <div className=" flex w-full justify-between px-8 py-8 md:px-16">
           <Link to={"/"} className="text-main md:text-3xl md:tracking-[4rem]">
             QUIZ
           </Link>

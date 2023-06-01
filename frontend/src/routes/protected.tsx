@@ -1,6 +1,10 @@
 import { Navigate } from "react-router-dom";
 
+import { Home, Profile, Room } from "@/components/Pages";
+
 export const protectedRoutes = [
-  { path: "/", element: <div>Index</div> },
+  { path: "/", element: <Home /> },
+  { path: "/profile", element: <Profile /> },
+  { path: "/room/:roomId", element: <Room /> },
   { path: "*", element: <Navigate to="." /> },
 ];
