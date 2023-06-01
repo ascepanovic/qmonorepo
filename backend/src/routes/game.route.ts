@@ -1,0 +1,95 @@
+import express from "express";
+import { isAuthorized } from "../middleware/isAuthorized";
+import {
+  findAllGamesController,
+  findGameByIdController,
+  createGameController,
+  updateGameController,
+  deleteGameController,
+} from "./../controllers/game.controller";
+
+const router = express.Router();
+
+router.use(isAuthorized);
+
+/**
+ * @swagger
+ * /game:
+ *   get:
+ *     summary: Get all games
+ *     tags: [Game]
+ *     responses:
+ *       200:
+ *         description: Successful operation
+ *       500:
+ *         description: Error retrieving games
+ */
+router.get("/", findAllGamesController);
+/**
+ * @swagger
+ * /game/{id}:
+ *   get:
+ *     summary: Get a game by ID
+ *     tags: [Game]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: game ID
+ *     responses:
+ *       200:
+ *         description: Successful operation
+ *       404:
+ *         description: game not found
+ */
+router.get("/:id", findGameByIdController);
+/**
+ * @swagger
+ * /game:
+ *   post:
+ *     summary: Create a new game
+ *     tags: [Game]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               socketId:
+ *                 type: string
+ *               categoryId:
+ *                 type: number
+ *     responses:
+ *       201:
+ *         description: game created successfully
+ *       400:
+ *         description: Invalid game data
+ */
+
+router.post("/", isAuthorized, createGameController);
+
+/**
+ * @swagger
+ * /game/{id}:
+ *   delete:
+ *     summary: Delete a game by ID
+ *     tags: [Game]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: game ID
+ *     responses:
+ *       200:
+ *         description: game deleted successfully
+ *       404:
+ *         description: game not found
+ */
+router.delete("/:id", deleteGameController);
+
+export { router as gameRouter };

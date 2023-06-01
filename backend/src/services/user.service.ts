@@ -1,51 +1,42 @@
 import { prisma } from "../utils/prisma"; // import your prisma instance
 
 export interface UserInterface {
-  id: string;
-  name: string;
-  email: string;
-  photo: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export type UserRead = {
   id: number;
   name: string;
   email: string;
   photo: string;
   createdAt: Date;
   updatedAt: Date;
-};
+}
 
-export type UserWrite = {
+export type CreateUser = {
   name: string;
   email: string;
   photo: string;
 };
 
 export async function findOrCreate(user: any) {
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.users.findUnique({
     where: { email: user.email },
   });
   if (existingUser) {
     return existingUser;
   }
 
-  const newUser = await prisma.user.create({ data: user });
+  const newUser = await prisma.users.create({ data: user });
   return newUser;
 }
 export async function findAll() {
-  return await prisma.user.findMany();
+  return await prisma.users.findMany();
 }
 export async function findById(id: number) {
-  return await prisma.user.findUnique({
+  return await prisma.users.findUnique({
     where: { id },
   });
 }
 
 export async function create(user: any) {
-  return await prisma.user.create({
+  return await prisma.users.create({
     data: {
       name: user.name,
       email: user.email,
@@ -55,14 +46,14 @@ export async function create(user: any) {
 }
 
 export async function update(id: number, user: any) {
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.users.findUnique({
     where: { id },
   });
   if (!existingUser) {
     return null;
   }
 
-  return await prisma.user.update({
+  return await prisma.users.update({
     where: { id },
     data: {
       name: user.name,
@@ -72,13 +63,13 @@ export async function update(id: number, user: any) {
 }
 
 export async function deleteUser(id: number) {
-  const existingUser = await prisma.user.findUnique({
+  const existingUser = await prisma.users.findUnique({
     where: { id },
   });
   if (!existingUser) {
     return null;
   }
-  return await prisma.user.delete({
+  return await prisma.users.delete({
     where: { id },
   });
 }

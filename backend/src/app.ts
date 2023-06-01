@@ -3,9 +3,40 @@ import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import path from "path";
 import connectDB from "./utils/prisma";
 import routes from "./routes/routes";
+import { initializeSocketIO } from "./utils/socket";
 
+const swaggerOptions = {
+  swaggerDefinition: {
+    openapi: "3.0.0",
+    info: {
+      title: "QUIZ APP",
+      version: "1.0.0",
+      description: "QUIZ APP Documentation",
+    },
+    components: {
+      securitySchemes: {
+        AuthCookie: {
+          type: "apiKey",
+          name: "Cookie",
+          in: "cookie",
+        },
+      },
+    },
+    security: [
+      {
+        AuthCookie: [],
+      },
+    ],
+  },
+  apis: [path.resolve(__dirname, "./routes/*.ts")],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
 const app = express();
 
 app.use(express.json({ limit: "10kb" }));
@@ -21,6 +52,8 @@ app.use(
   })
 );
 app.use(routes);
+
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.get("/healthcheck", (req: Request, res: Response) => {
   res.status(200).json({
@@ -45,7 +78,8 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server started on port: ${port}`);
   connectDB();
+  initializeSocketIO(server);
 });

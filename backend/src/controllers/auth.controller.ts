@@ -3,8 +3,9 @@ import { OAuth2Client } from "google-auth-library";
 import { generateAccessToken } from "../services/auth.service";
 import { findOrCreate } from "../services/user.service";
 import { handleResponseError } from "../utils/global";
+import { AuthenticatedRequest } from "../middleware/isAuthorized";
 
-const CLIENT_ID = process.env.GOOGLE_OAUTH_CLIENT_ID;
+const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 const oAuth2Client = new OAuth2Client(CLIENT_ID);
 
@@ -13,7 +14,7 @@ export const signInWithGoogle = async (req: Request, res: Response) => {
   try {
     const ticket = await oAuth2Client.verifyIdToken({
       idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
+      audience: CLIENT_ID,
     });
     if (ticket.getPayload() && ticket.getPayload()?.email_verified) {
       const data = {
@@ -32,6 +33,7 @@ export const signInWithGoogle = async (req: Request, res: Response) => {
         .json({ message: "Logged in successfully!" });
     }
   } catch (error) {
+    console.error(error);
     handleResponseError(res, error);
   }
 };
@@ -45,4 +47,20 @@ export const logout = async (req: Request, res: Response) => {
 
 export const checkUser = (req: any, res: Response) => {
   return res.status(200).send(req.user);
+};
+export const testUser = async (req: any, res: Response) => {
+  const data = {
+    email: `${Date.now()}@mail.com`,
+    photo: "picture.jpg",
+    name: "IME",
+  };
+  const user = await findOrCreate(data);
+  const token = generateAccessToken(user);
+  return res
+    .cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    })
+    .status(200)
+    .json({ message: "Logged in successfully!" });
 };
