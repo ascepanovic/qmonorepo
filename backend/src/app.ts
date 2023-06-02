@@ -51,11 +51,11 @@ app.use(
     origin: [FRONTEND_ORIGIN],
   })
 );
-app.use(routes);
+app.use("/api", routes);
 
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-app.get("/healthcheck", (req: Request, res: Response) => {
+app.get("/api/healthcheck", (req: Request, res: Response) => {
   res.status(200).json({
     message: "Success!",
   });
