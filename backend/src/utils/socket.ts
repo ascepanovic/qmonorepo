@@ -1,8 +1,14 @@
+require("dotenv").config();
 import { Server, Socket } from "socket.io";
 import { create, findById, getPlayersInGame } from "../services/game.service";
 
 export function initializeSocketIO(server: any) {
-  const io = new Server(server);
+  const io = new Server({
+    ...server,
+    credentials: true,
+    origin: process.env.FRONTEND_ORIGIN,
+    methods: ["GET", "POST"],
+  });
 
   io.on("connection", (socket: Socket) => {
     console.log(`Socket connected: ${socket.id}`);
