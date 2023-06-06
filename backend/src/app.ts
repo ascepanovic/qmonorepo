@@ -1,4 +1,5 @@
 require("dotenv").config();
+import http from "http";
 import express, { NextFunction, Request, Response } from "express";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
@@ -9,6 +10,9 @@ import path from "path";
 import connectDB from "./utils/prisma";
 import routes from "./routes/routes";
 import { initializeSocketIO } from "./utils/socket";
+
+const app = express();
+const server = new http.Server(app);
 
 const swaggerOptions = {
   swaggerDefinition: {
@@ -37,7 +41,6 @@ const swaggerOptions = {
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-const app = express();
 
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
@@ -78,7 +81,7 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server started on port: ${port}`);
   connectDB();
   initializeSocketIO(server);

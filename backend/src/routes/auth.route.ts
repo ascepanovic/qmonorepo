@@ -14,7 +14,7 @@ const router: Router = express.Router();
 
 /**
  * @swagger
- * /auth:
+ * /api/auth:
  *   get:
  *     summary: Return test user cookie
  *     tags: [Auth]
@@ -27,7 +27,7 @@ const router: Router = express.Router();
 router.get("/", testUser);
 /**
  * @swagger
- * /auth/login:
+ * /api/auth/login:
  *   post:
  *     summary: Google login
  *     tags: [Auth]
@@ -50,7 +50,7 @@ router.get("/", testUser);
 router.post("/login", signInWithGoogle);
 /**
  * @swagger
- * /auth/check:
+ * /api/auth/check:
  *   get:
  *     summary: Current user check
  *     tags: [Auth]
@@ -61,6 +61,18 @@ router.post("/login", signInWithGoogle);
  *         description: Error retrieving questions
  */
 router.get("/check", isAuthorized, checkUser);
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   get:
+ *     summary: Logs out user
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: Successful operation
+ *       500:
+ *         description: Error retrieving questions
+ */
 router.get("/logout", isAuthorized, logout);
 
 export { router as authRouter };

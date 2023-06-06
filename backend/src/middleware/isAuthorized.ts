@@ -29,7 +29,7 @@ export const isAuthorized: RequestHandler = function (
       id: user.id,
       name: user.name,
       email: user.email,
-      photo: user.picture,
+      photo: user.photo,
       role: user.role,
     };
     next();

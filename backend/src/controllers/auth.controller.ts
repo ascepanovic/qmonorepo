@@ -3,7 +3,6 @@ import { OAuth2Client } from "google-auth-library";
 import { generateAccessToken } from "../services/auth.service";
 import { findOrCreate } from "../services/user.service";
 import { handleResponseError } from "../utils/global";
-import { AuthenticatedRequest } from "../middleware/isAuthorized";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
@@ -28,6 +27,7 @@ export const signInWithGoogle = async (req: Request, res: Response) => {
         .cookie("token", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
+          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
         })
         .status(200)
         .json({ message: "Logged in successfully!" });
@@ -60,6 +60,7 @@ export const testUser = async (req: any, res: Response) => {
     .cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
     })
     .status(200)
     .json({ message: "Logged in successfully!" });

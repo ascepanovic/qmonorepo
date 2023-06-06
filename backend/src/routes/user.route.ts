@@ -14,7 +14,7 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /user:
+ * /api/user:
  *   get:
  *     summary: Get all users
  *     tags: [User]
@@ -28,7 +28,7 @@ router.get("/", getAllUsersController);
 
 /**
  * @swagger
- * /user/{id}:
+ * /api/user/{id}:
  *   get:
  *     summary: Get a user by ID
  *     tags: [User]
@@ -49,7 +49,7 @@ router.get("/:id", getUserByIdController);
 
 /**
  * @swagger
- * /user:
+ * /api/user:
  *   post:
  *     summary: Create a new user
  *     tags: [User]
@@ -78,7 +78,7 @@ router.post("/", createUserController);
 
 /**
  * @swagger
- * /user/{id}:
+ * /api/user/{id}:
  *   put:
  *     summary: Update a user by ID
  *     tags: [User]
@@ -113,7 +113,7 @@ router.put("/:id", updateUserByIdController);
 
 /**
  * @swagger
- * /user/{id}:
+ * /api/user/{id}:
  *   delete:
  *     summary: Delete a user by ID
  *     tags: [User]

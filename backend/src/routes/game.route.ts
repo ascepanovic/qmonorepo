@@ -14,7 +14,7 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /game:
+ * /api/game:
  *   get:
  *     summary: Get all games
  *     tags: [Game]
@@ -27,7 +27,7 @@ router.use(isAuthorized);
 router.get("/", findAllGamesController);
 /**
  * @swagger
- * /game/{id}:
+ * /api/game/{id}:
  *   get:
  *     summary: Get a game by ID
  *     tags: [Game]
@@ -47,7 +47,7 @@ router.get("/", findAllGamesController);
 router.get("/:id", findGameByIdController);
 /**
  * @swagger
- * /game:
+ * /api/game:
  *   post:
  *     summary: Create a new game
  *     tags: [Game]
@@ -73,7 +73,7 @@ router.post("/", isAuthorized, createGameController);
 
 /**
  * @swagger
- * /game/{id}:
+ * /api/game/{id}:
  *   delete:
  *     summary: Delete a game by ID
  *     tags: [Game]

@@ -14,7 +14,7 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /answer:
+ * /api/answer:
  *   get:
  *     summary: Get all answers
  *     tags: [Answer]
@@ -27,7 +27,7 @@ router.use(isAuthorized);
 router.get("/", getAllAnswersController);
 /**
  * @swagger
- * /answer/{id}:
+ * /api/answer/{id}:
  *   get:
  *     summary: Get a answer by ID
  *     tags: [Answer]
@@ -47,7 +47,7 @@ router.get("/", getAllAnswersController);
 router.get("/:id", getAnswerByIdController);
 /**
  * @swagger
- * /answer:
+ * /api/answer:
  *   post:
  *     summary: Create a new answer
  *     tags: [Answer]
@@ -73,7 +73,7 @@ router.get("/:id", getAnswerByIdController);
 router.post("/", createAnswerController);
 /**
  * @swagger
- * /answer/{id}:
+ * /api/answer/{id}:
  *   put:
  *     summary: Update a answer by ID
  *     tags: [Answer]
@@ -108,7 +108,7 @@ router.post("/", createAnswerController);
 router.put("/:id", updateAnswerController);
 /**
  * @swagger
- * /answer/{id}:
+ * /api/answer/{id}:
  *   delete:
  *     summary: Delete a answer by ID
  *     tags: [Answer]
