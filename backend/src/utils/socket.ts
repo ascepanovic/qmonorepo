@@ -30,7 +30,7 @@ export function initializeSocketIO(server: any) {
     socket.on("createGame", async (payload) => {
       try {
         const { userId, categoryId } = payload;
-        const game = await create(socket.id, categoryId, userId);
+        const game = await create(socket.id, +categoryId, +userId);
         socket.join(game.socket_id);
         socket.emit("gameCreated", game.socket_id);
       } catch (error) {
@@ -47,7 +47,7 @@ export function initializeSocketIO(server: any) {
       }
     });
 
-    socket.on("joinGame", async (gameId, userId) => {
+    socket.on("joinGame", async (gameId: number, userId: number) => {
       try {
         const game = await findById(gameId);
         if (game && game.game_status === "WAITING") {
@@ -60,7 +60,7 @@ export function initializeSocketIO(server: any) {
           const categoryId = await findCategoryIdByGame(gameId);
           if (players.length === 4 && categoryId) {
             await update(gameId, GameStatus.ACTIVE);
-            const question = await getRandomQuestion(categoryId);
+            const question = await getRandomQuestion(+categoryId);
 
             if (question) {
               io.to(game.socket_id).emit("gameStarted", question.text);
@@ -76,39 +76,42 @@ export function initializeSocketIO(server: any) {
       }
     });
 
-    socket.on("answer", async (gameId, userId, answerId) => {
-      try {
-        const game = await findById(gameId);
-        const categoryId = await findCategoryIdByGame(gameId);
-        if (game && game.game_status === "ACTIVE" && categoryId) {
-          const question = await getRandomQuestion(categoryId);
-          const answer = await findAnswerById(answerId);
-          if (question && answer?.is_correct === true) {
-            await updateScore(gameId, userId, true);
-            io.to(game.socket_id).emit("answerResult", {
-              userId,
-              isCorrect: true,
-            });
-          } else {
-            await updateScore(gameId, userId, false);
-            io.to(game.socket_id).emit("answerResult", {
-              userId,
-              isCorrect: false,
-            });
-          }
+    socket.on(
+      "answer",
+      async (gameId: number, userId: number, answerId: number) => {
+        try {
+          const game = await findById(gameId);
+          const categoryId = await findCategoryIdByGame(gameId);
+          if (game && game.game_status === "ACTIVE" && categoryId) {
+            const question = await getRandomQuestion(categoryId);
+            const answer = await findAnswerById(answerId);
+            if (question && answer?.is_correct === true) {
+              await updateScore(gameId, userId, true);
+              io.to(game.socket_id).emit("answerResult", {
+                userId,
+                isCorrect: true,
+              });
+            } else {
+              await updateScore(gameId, userId, false);
+              io.to(game.socket_id).emit("answerResult", {
+                userId,
+                isCorrect: false,
+              });
+            }
 
-          if (question) {
-            io.to(game.socket_id).emit("nextQuestion", question.text);
+            if (question) {
+              io.to(game.socket_id).emit("nextQuestion", question.text);
 
-            startTimer(10, () => {
-              io.to(game.socket_id).emit("timerExpired");
-            });
+              startTimer(10, () => {
+                io.to(game.socket_id).emit("timerExpired");
+              });
+            }
           }
+        } catch (error) {
+          console.error(`Failed to process answer: ${error}`);
         }
-      } catch (error) {
-        console.error(`Failed to process answer: ${error}`);
       }
-    });
+    );
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);

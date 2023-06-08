@@ -15,8 +15,7 @@ export const findAllGamesController = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { gameId } = req.body;
-    const games = await getPlayersInGame(gameId);
+    const games = await findAll();
     res.status(200).send(games);
   } catch (error) {
     handleResponseError(res, error);
