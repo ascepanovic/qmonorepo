@@ -63,9 +63,9 @@ export const updateGameController = async (
   res: Response
 ): Promise<void> => {
   const gameId = parseInt(req.params.id);
-  const { created_by } = req.body;
+  const { status } = req.body;
   try {
-    const game = await update(gameId, created_by);
+    const game = await update(gameId, status);
     res.status(200).send(game);
   } catch (error) {
     handleResponseError(res, error);

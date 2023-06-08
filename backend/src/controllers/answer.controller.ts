@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import {
   create,
-  findById,
+  findAnswerById,
   findAll,
   update,
   deleteAnswer,
@@ -24,7 +24,7 @@ export async function getAnswerByIdController(req: Request, res: Response) {
   const answerId: number = parseInt(req.params.id);
 
   try {
-    const answer = await findById(answerId);
+    const answer = await findAnswerById(answerId);
     if (answer) {
       res.status(200).send(answer);
     } else {

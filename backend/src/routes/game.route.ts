@@ -70,6 +70,41 @@ router.get("/:id", findGameByIdController);
  */
 
 router.post("/", isAuthorized, createGameController);
+/**
+ * @swagger
+ * /api/game/{id}:
+ *   put:
+ *     summary: Update a game by ID
+ *     tags: [Game]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the game to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *                status:
+ *                 type: string
+ *                 enum:
+ *                   - ACTIVE
+ *                   - WAITING
+ *                   - FINISHED
+ *     responses:
+ *       200:
+ *         description: game updated successfully
+ *       400:
+ *         description: Invalid game data
+ *       404:
+ *         description: game not found
+ */
+router.put("/:id", updateGameController);
 
 /**
  * @swagger

@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../utils/prisma";
 
 export async function findAll() {
@@ -16,6 +17,11 @@ export async function findById(id: number) {
   return await prisma.games.findUnique({
     where: { id },
     include: {
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       game_users: {
         include: {
           user: true,
@@ -85,12 +91,12 @@ export async function assignToGame(gameId: number, userId: number) {
   return assignedUser;
 }
 
-export async function update(id: number, created_by: number) {
+export async function update(id: number, status: GameStatus) {
   return await prisma.games.update({
     where: { id },
     data: {
-      created_by,
-    },
+      room_status: status,
+    } as Prisma.gamesUpdateInput,
   });
 }
 
@@ -105,4 +111,58 @@ export async function deleteGame(id: number) {
   return await prisma.games.delete({
     where: { id },
   });
+}
+export async function getWaitingGames() {
+  const rooms = await prisma.games.findMany({
+    where: { game_status: "WAITING" },
+  });
+
+  return rooms;
+}
+export async function updateScore(
+  gameId: number,
+  userId: number,
+  isCorrect: boolean
+): Promise<void> {
+  if (isCorrect) {
+    try {
+      const gameByUser = await prisma.games_by_user.findFirst({
+        where: {
+          game_id: gameId,
+          user_id: userId,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (gameByUser?.id)
+        await prisma.games_by_user.update({
+          where: {
+            id: gameByUser.id,
+          },
+          data: {
+            points: {
+              increment: 1,
+            },
+          },
+        });
+    } catch (error) {
+      console.error(`Failed to update score: ${error}`);
+      throw new Error("Failed to update score");
+    }
+  }
+}
+export async function findCategoryIdByGame(gameId: number) {
+  const game = await findById(gameId);
+  const categoryId = game?.categories
+    .map((e) => e.category?.id)
+    .find((id) => id !== undefined);
+  return categoryId;
+}
+
+export enum GameStatus {
+  ACTIVE,
+  WAITING,
+  FINISHED,
 }

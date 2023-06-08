@@ -56,6 +56,7 @@ model games {
   id          Int             @id @default(autoincrement())
   socket_id String
   created_by  Int             @map("created_by")
+  game_status      GameStatus     @default(WAITING)
   created_at  DateTime @default(now())
   game_users  games_by_user[]
   categories  game_category[]
@@ -86,4 +87,9 @@ model users {
 enum Role {
   USER
   ADMIN
+}
+enum GameStatus {
+  ACTIVE
+  WAITING
+  FINISHED
 }

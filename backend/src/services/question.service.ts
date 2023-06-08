@@ -13,7 +13,15 @@ export async function create(question: any) {
   });
 }
 export async function findAll() {
-  return await prisma.questions.findMany();
+  return await prisma.questions.findMany({
+    include: {
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
+  });
 }
 export async function findById(id: number) {
   return await prisma.questions.findUnique({
@@ -56,4 +64,27 @@ export async function deleteQuestion(id: number) {
   return await prisma.questions.delete({
     where: { id },
   });
+}
+
+export async function getRandomQuestion(categoryId: number) {
+  const result = await prisma.category.findUnique({
+    where: { id: categoryId },
+    include: {
+      questions: {
+        include: {
+          question: true,
+        },
+      },
+    },
+  });
+
+  const questions = result?.questions.map((e) => e.question);
+
+  if (!questions || questions.length === 0) {
+    return null;
+  }
+
+  const randomQuestion =
+    questions[Math.floor(Math.random() * questions.length)];
+  return randomQuestion;
 }

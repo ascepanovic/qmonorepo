@@ -1,6 +1,18 @@
 import dotenv from "dotenv";
 import { Server } from "socket.io";
-import { create, findById, getPlayersInGame } from "../services/game.service";
+import {
+  GameStatus,
+  assignToGame,
+  create,
+  update,
+  findById,
+  getPlayersInGame,
+  getWaitingGames,
+  updateScore,
+  findCategoryIdByGame,
+} from "../services/game.service";
+import { findAnswerById } from "../services/answer.service";
+import { getRandomQuestion } from "../services/question.service";
 
 dotenv.config();
 
@@ -12,34 +24,51 @@ export function initializeSocketIO(server: any) {
       credentials: true,
     },
   });
-
   io.on("connection", (socket) => {
     console.log(`Socket connected: ${socket.id}`);
 
-    socket.on("createRoom", async (payload) => {
+    socket.on("createGame", async (payload) => {
       try {
         const { userId, categoryId } = payload;
         const game = await create(socket.id, categoryId, userId);
-        if (game) {
-          socket.emit("roomCreated", game);
-        }
+        socket.join(game.socket_id);
+        socket.emit("gameCreated", game.socket_id);
       } catch (error) {
-        console.error(`Failed to create room: ${error}`);
+        console.error(`Failed to create game: ${error}`);
       }
     });
 
-    socket.on("joinRoom", async (gameId, userId) => {
+    socket.on("getWaitingGames", async () => {
+      try {
+        const waitingGames = await getWaitingGames();
+        socket.emit("waitingGames", waitingGames);
+      } catch (error) {
+        console.error(`Failed to get waiting games: ${error}`);
+      }
+    });
+
+    socket.on("joinGame", async (gameId, userId) => {
       try {
         const game = await findById(gameId);
-        if (game) {
-          const players = await getPlayersInGame(gameId);
-          const playerCount = players.length;
+        if (game && game.game_status === "WAITING") {
+          await assignToGame(gameId, userId);
 
-          if (playerCount < 4) {
-            socket.join(`game_${gameId}`);
-            socket.join(`user_${userId}`);
-          } else {
-            socket.emit("playerLimitReached");
+          socket.join(game.socket_id);
+          io.to(game.socket_id).emit("playerJoined ", userId);
+
+          const players = await getPlayersInGame(gameId);
+          const categoryId = await findCategoryIdByGame(gameId);
+          if (players.length === 4 && categoryId) {
+            await update(gameId, GameStatus.ACTIVE);
+            const question = await getRandomQuestion(categoryId);
+
+            if (question) {
+              io.to(game.socket_id).emit("gameStarted", question.text);
+
+              startTimer(10, () => {
+                io.to(game.socket_id).emit("timerExpired");
+              });
+            }
           }
         }
       } catch (error) {
@@ -47,14 +76,37 @@ export function initializeSocketIO(server: any) {
       }
     });
 
-    socket.on("startGame", async (gameId) => {
+    socket.on("answer", async (gameId, userId, answerId) => {
       try {
         const game = await findById(gameId);
-        if (game) {
-          io.to(`game_${gameId}`).emit("gameStarted", game);
+        const categoryId = await findCategoryIdByGame(gameId);
+        if (game && game.game_status === "ACTIVE" && categoryId) {
+          const question = await getRandomQuestion(categoryId);
+          const answer = await findAnswerById(answerId);
+          if (question && answer?.is_correct === true) {
+            await updateScore(gameId, userId, true);
+            io.to(game.socket_id).emit("answerResult", {
+              userId,
+              isCorrect: true,
+            });
+          } else {
+            await updateScore(gameId, userId, false);
+            io.to(game.socket_id).emit("answerResult", {
+              userId,
+              isCorrect: false,
+            });
+          }
+
+          if (question) {
+            io.to(game.socket_id).emit("nextQuestion", question.text);
+
+            startTimer(10, () => {
+              io.to(game.socket_id).emit("timerExpired");
+            });
+          }
         }
       } catch (error) {
-        console.error(`Failed to start game: ${error}`);
+        console.error(`Failed to process answer: ${error}`);
       }
     });
 
@@ -62,4 +114,7 @@ export function initializeSocketIO(server: any) {
       console.log(`Socket disconnected: ${socket.id}`);
     });
   });
+}
+function startTimer(duration: number, callback: () => void) {
+  const timer = setTimeout(callback, duration * 1000);
 }
