@@ -9,7 +9,7 @@ export const useUsers = () => {
   const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
-    const getCategories = async () => {
+    const getUsers = async () => {
       try {
         const res = await user.all();
         setUsers(res.data);
@@ -18,7 +18,7 @@ export const useUsers = () => {
       }
       setIsLoading(false);
     };
-    getCategories();
+    getUsers();
   }, []);
 
   return { users, isLoading, hasError };
