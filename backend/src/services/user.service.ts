@@ -1,3 +1,4 @@
+import { error } from "console";
 import { prisma } from "../utils/prisma"; // import your prisma instance
 
 export interface UserInterface {
@@ -72,4 +73,22 @@ export async function deleteUser(id: number) {
   return await prisma.users.delete({
     where: { id },
   });
+}
+export async function getUserPoints(userId: number): Promise<number> {
+  let totalPoints = 0;
+  const user = await prisma.users.findUnique({
+    where: { id: userId },
+    select: {
+      games: {
+        select: { points: true },
+      },
+    },
+  });
+
+  if (user) {
+    totalPoints = user.games.reduce((sum, game) => sum + game.points, 0);
+    return totalPoints;
+  } else {
+    throw new Error("User not found");
+  }
 }

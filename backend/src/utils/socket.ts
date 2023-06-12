@@ -13,6 +13,7 @@ import {
 } from "../services/game.service";
 import { findAnswerById } from "../services/answer.service";
 import { getRandomQuestion } from "../services/question.service";
+import { getUserPoints } from "../services/user.service";
 
 dotenv.config();
 
@@ -112,6 +113,18 @@ export function initializeSocketIO(server: any) {
         }
       }
     );
+    socket.on("getOnlineUsers", () => {
+      const onlineUsersCount = Object.keys(io.sockets.sockets).length;
+      socket.emit("onlineUsersCount", onlineUsersCount);
+    });
+    socket.on("getUserPoints", async (userId) => {
+      try {
+        const userPoints = await getUserPoints(userId);
+        socket.emit("userPoints", userPoints);
+      } catch (error) {
+        console.error(`Failed to get user points: ${error}`);
+      }
+    });
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);
