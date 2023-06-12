@@ -5,8 +5,8 @@ export type ModalProps = {
   setVisibility: (value: boolean) => void;
   title: ReactNode;
   body: ReactNode;
-  submitHandler: () => void;
-  submitText: ReactNode;
+  submitHandler?: () => void;
+  submitText?: ReactNode;
 };
 
 export const Modal = ({
@@ -20,11 +20,11 @@ export const Modal = ({
   return (
     <>
       <div
-        className={`fixed top-1/2 z-50 flex -translate-y-1/2 items-center justify-center outline-none focus:outline-none ${
+        className={`fixed left-1/2 top-1/2 z-50 flex -translate-x-1/2 -translate-y-1/2 items-center justify-center outline-none focus:outline-none ${
           visible ? "" : "hidden"
         }`}
       >
-        <div className=" mx-auto my-6 w-96 rounded-lg bg-main-bg shadow-[0_0_20px_10px_#2AE78B]">
+        <div className="mx-auto my-6 w-96 rounded-lg bg-main-bg shadow-[0_0_20px_10px_#2AE78B]">
           {/*content*/}
           <div className="bg-white  flex w-full flex-col rounded-lg border-0 shadow-lg outline-none focus:outline-none">
             {/*header*/}
@@ -49,13 +49,15 @@ export const Modal = ({
               >
                 Close
               </button>
-              <button
-                className="bg-emerald-500 text-white active:bg-emerald-600 mb-1 mr-1 rounded px-6 py-3 text-sm font-bold uppercase shadow outline-none transition-all duration-150 ease-linear hover:text-main hover:shadow-lg focus:outline-none"
-                type="button"
-                onClick={submitHandler}
-              >
-                {submitText}
-              </button>
+              {submitHandler ? (
+                <button
+                  className="bg-emerald-500 text-white active:bg-emerald-600 mb-1 mr-1 rounded px-6 py-3 text-sm font-bold uppercase shadow outline-none transition-all duration-150 ease-linear hover:text-main hover:shadow-lg focus:outline-none"
+                  type="button"
+                  onClick={submitHandler}
+                >
+                  {submitText || "Submit"}
+                </button>
+              ) : null}
             </div>
           </div>
         </div>

@@ -1,5 +1,7 @@
+import { ReactNode } from "react";
+
 export type ButtonProps = {
-  text: string;
+  text: ReactNode;
   onClick: () => void;
   className?: string;
 };

@@ -4,4 +4,9 @@ export const ENDPOINTS = {
     CHECK: "auth/check",
     LOGOUT: "auth/logout",
   },
+  ANSWER: "/answer",
+  CATEGORY: "/category",
+  GAME: "/game",
+  QUESTION: "/question",
+  USER: "/user",
 };
