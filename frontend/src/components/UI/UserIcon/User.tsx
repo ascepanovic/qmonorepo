@@ -3,9 +3,8 @@ import { BiLogOut } from "react-icons/bi";
 import { FaUserAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-import { ENDPOINTS } from "@/constants/Endpoints";
+import { auth } from "@/api";
 import { useAuthContext } from "@/context";
-import { http } from "@/lib/axios";
 
 export const User = () => {
   const [menu, setMenu] = useState(false);
@@ -15,7 +14,7 @@ export const User = () => {
 
   const logoutHandler = () => {
     toggleMenu();
-    http(ENDPOINTS.AUTH.LOGOUT).then(logout);
+    auth.logout().then(logout);
   };
 
   return (

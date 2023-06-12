@@ -9,6 +9,7 @@ import { User } from "./User";
 
 import { auth } from "@/api";
 import { useAuthContext } from "@/context";
+import { useUsers } from "@/hooks";
 
 export const UserIcon = () => {
   const { user, login } = useAuthContext();
@@ -21,6 +22,8 @@ export const UserIcon = () => {
     });
   };
 
+  const { users } = useUsers();
+
   if (user)
     return (
       <>
@@ -29,7 +32,7 @@ export const UserIcon = () => {
             onClick={() => setVisibility(true)}
             text={
               <span className="flex items-center justify-center gap-2">
-                <FaUserAlt></FaUserAlt> <span>50</span>
+                <FaUserAlt></FaUserAlt> <span>{users.length}</span>
               </span>
             }
             className="px-4 py-2"

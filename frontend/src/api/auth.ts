@@ -12,4 +12,5 @@ export const auth = {
       url: ENDPOINTS.AUTH.CHECK,
       method: "GET",
     }),
+  logout: async () => await http(ENDPOINTS.AUTH.LOGOUT),
 };
