@@ -113,11 +113,28 @@ export async function deleteGame(id: number) {
   });
 }
 export async function getWaitingGames() {
-  const rooms = await prisma.games.findMany({
+  const games = await prisma.games.findMany({
     where: { game_status: "WAITING" },
+    include: {
+      game_users: {
+        include: {
+          user: true,
+        },
+      },
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
   });
+  const waitingGamesWithPlayerCount = games.map((game) => ({
+    id: game.socket_id,
+    categoryId: game.categories.map((e) => e.category_id),
+    playerCount: game.game_users.map((e) => e.user).length,
+  }));
 
-  return rooms;
+  return waitingGamesWithPlayerCount;
 }
 export async function updateScore(
   gameId: number,

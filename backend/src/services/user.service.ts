@@ -1,5 +1,6 @@
 import { error } from "console";
 import { prisma } from "../utils/prisma"; // import your prisma instance
+import { GameStatus } from "./game.service";
 
 export interface UserInterface {
   id: number;
@@ -91,4 +92,30 @@ export async function getUserPoints(userId: number): Promise<number> {
   } else {
     throw new Error("User not found");
   }
+}
+export async function checkUserGameStatus(userId: number) {
+  const game = await prisma.games.findFirst({
+    where: {
+      OR: [
+        {
+          game_status: "WAITING",
+          game_users: {
+            some: {
+              user_id: userId,
+            },
+          },
+        },
+        {
+          game_status: "ACTIVE",
+          game_users: {
+            some: {
+              user_id: userId,
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  return game?.game_status || null;
 }

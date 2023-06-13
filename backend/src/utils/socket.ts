@@ -13,7 +13,7 @@ import {
 } from "../services/game.service";
 import { findAnswerById } from "../services/answer.service";
 import { getRandomQuestion } from "../services/question.service";
-import { getUserPoints } from "../services/user.service";
+import { checkUserGameStatus, getUserPoints } from "../services/user.service";
 
 dotenv.config();
 
@@ -31,6 +31,12 @@ export function initializeSocketIO(server: any) {
     socket.on("createGame", async (payload) => {
       try {
         const { userId, categoryId } = payload;
+
+        const userGameStatus = await checkUserGameStatus(userId);
+
+        if (userGameStatus) {
+          return socket.emit("joinGameError", "Player is already in a game");
+        }
         const game = await create(socket.id, +categoryId, +userId);
         socket.join(game.socket_id);
         socket.emit("gameCreated", game.socket_id);
@@ -50,6 +56,10 @@ export function initializeSocketIO(server: any) {
 
     socket.on("joinGame", async (gameId: number, userId: number) => {
       try {
+        const userGameStatus = await checkUserGameStatus(userId);
+        if (userGameStatus) {
+          return socket.emit("joinGameError", "Player is already in a game");
+        }
         const game = await findById(gameId);
         if (game && game.game_status === "WAITING") {
           await assignToGame(gameId, userId);
