@@ -130,7 +130,7 @@ export async function getWaitingGames() {
   });
   const waitingGamesWithPlayerCount = games.map((game) => ({
     id: game.socket_id,
-    categoryId: game.categories.map((e) => e.category_id),
+    category: game.categories.map((e) => e.category?.name)[0],
     playerCount: game.game_users.map((e) => e.user).length,
   }));
 
