@@ -95,8 +95,8 @@ export async function update(id: number, status: GameStatus) {
   return await prisma.games.update({
     where: { id },
     data: {
-      room_status: status,
-    } as Prisma.gamesUpdateInput,
+      game_status: status as any,
+    },
   });
 }
 
