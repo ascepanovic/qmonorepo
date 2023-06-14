@@ -72,7 +72,11 @@ export async function getRandomQuestion(categoryId: number) {
     include: {
       questions: {
         include: {
-          question: true,
+          question: {
+            include: {
+              answers: true,
+            },
+          },
         },
       },
     },
