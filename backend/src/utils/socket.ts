@@ -16,7 +16,8 @@ import { getRandomQuestion } from "../services/question.service";
 import { checkUserGameStatus, getUserPoints } from "../services/user.service";
 
 dotenv.config();
-
+let currentQuestionNumber = 0;
+let maxQuestions = 4;
 export function initializeSocketIO(server: any) {
   const io = new Server(server, {
     cors: {
@@ -61,7 +62,7 @@ export function initializeSocketIO(server: any) {
           return socket.emit("joinGameError", "Player is already in a game");
         }
         const game = await findById(gameId);
-        if (game && game.game_status === "WAITING") {
+        if (game && game.game_status === GameStatus.Waiting) {
           await assignToGame(gameId, userId);
 
           socket.join(game.socket_id);
@@ -70,10 +71,11 @@ export function initializeSocketIO(server: any) {
           const players = await getPlayersInGame(gameId);
           const categoryId = await findCategoryIdByGame(gameId);
           if (players.length === 4 && categoryId) {
-            await update(gameId, GameStatus.ACTIVE);
+            await update(gameId, GameStatus.Active);
             const question = await getRandomQuestion(+categoryId);
 
             if (question) {
+              currentQuestionNumber = 1;
               io.to(game.socket_id).emit("gameStarted", question.text);
 
               startTimer(10, () => {
@@ -93,7 +95,7 @@ export function initializeSocketIO(server: any) {
         try {
           const game = await findById(gameId);
           const categoryId = await findCategoryIdByGame(gameId);
-          if (game && game.game_status === "ACTIVE" && categoryId) {
+          if (game && game.game_status === GameStatus.Active && categoryId) {
             const question = await getRandomQuestion(categoryId);
             const answer = await findAnswerById(answerId);
             if (question && answer?.is_correct === true) {
@@ -111,11 +113,15 @@ export function initializeSocketIO(server: any) {
             }
 
             if (question) {
+              currentQuestionNumber++;
               io.to(game.socket_id).emit("nextQuestion", question.text);
 
               startTimer(10, () => {
                 io.to(game.socket_id).emit("timerExpired");
               });
+            }
+            if (currentQuestionNumber >= maxQuestions) {
+              io.to(game.socket_id).emit("gameEnded");
             }
           }
         } catch (error) {

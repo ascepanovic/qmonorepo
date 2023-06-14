@@ -95,7 +95,9 @@ export async function update(id: number, status: GameStatus) {
   return await prisma.games.update({
     where: { id },
     data: {
-      game_status: status as any,
+      game_status: {
+        set: status,
+      },
     },
   });
 }
@@ -179,7 +181,7 @@ export async function findCategoryIdByGame(gameId: number) {
 }
 
 export enum GameStatus {
-  ACTIVE,
-  WAITING,
-  FINISHED,
+  Active = "ACTIVE",
+  Waiting = "WAITING",
+  Finished = "FINISHED",
 }
