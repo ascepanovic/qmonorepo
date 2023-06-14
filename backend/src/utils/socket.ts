@@ -76,7 +76,7 @@ export function initializeSocketIO(server: any) {
 
             if (question) {
               currentQuestionNumber = 1;
-              io.to(game.socket_id).emit("gameStarted", question.text);
+              io.to(game.socket_id).emit("gameStarted", question);
 
               startTimer(10, () => {
                 io.to(game.socket_id).emit("timerExpired");
@@ -114,7 +114,7 @@ export function initializeSocketIO(server: any) {
 
             if (question) {
               currentQuestionNumber++;
-              io.to(game.socket_id).emit("nextQuestion", question.text);
+              io.to(game.socket_id).emit("nextQuestion", question);
 
               startTimer(10, () => {
                 io.to(game.socket_id).emit("timerExpired");
