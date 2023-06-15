@@ -123,6 +123,7 @@ export function initializeSocketIO(server: any) {
           if (currentQuestionNumber >= maxQuestions) {
             currentQuestionNumber = 0;
             await update(gameId, GameStatus.Finished);
+            clearTimeout(timer);
             io.to(socketId).emit("gameEnded");
           }
         }
