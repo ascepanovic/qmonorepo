@@ -12,9 +12,9 @@ export type RoomUsersProps = {
 export const RoomUsers = ({ users }: RoomUsersProps) => {
   const [points, setPoints] = useState(0);
   useEffect(() => {
-    socket.emit("getUserPoints", users[0].id);
+    if (users.length) socket.emit("getUserPoints", users[0].id);
     socket.on("userPoints", setPoints);
-  }, []);
+  }, [users]);
 
   return (
     <section className="mt-4 flex w-full justify-evenly">

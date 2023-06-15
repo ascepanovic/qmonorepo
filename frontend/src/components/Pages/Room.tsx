@@ -1,22 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Question } from "../UI/Question";
 import { RoomUsers } from "../UI/RoomUsers";
 
-import { useAuthContext } from "@/context";
 import { socket } from "@/lib/socket";
+import { UserT } from "@/types";
 
 export const Room = () => {
-  const { user } = useAuthContext();
+  const [users, setUsers] = useState<UserT[]>([]);
   const navigate = useNavigate();
   useEffect(() => {
     socket.on("gameEnded", () => navigate("/"));
+    socket.on("playersInGame", setUsers);
   }, []);
 
   return (
     <>
-      <RoomUsers users={[user, user, user, user]} />
+      <RoomUsers users={users} />
       <Question />
     </>
   );

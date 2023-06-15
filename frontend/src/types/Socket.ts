@@ -1,4 +1,4 @@
-import { QuestionT, WaitingGameT } from ".";
+import { QuestionT, UserT, WaitingGameT } from ".";
 
 export interface ServerToClientEvents {
   gameCreated: (gameId: string) => void;
@@ -12,6 +12,7 @@ export interface ServerToClientEvents {
   onlineUsersCount: (count: number) => void;
   userPoints: (points: number) => void;
   gameEnded: () => void;
+  playersInGame: (players: UserT[]) => void;
 }
 
 export interface ClientToServerEvents {
