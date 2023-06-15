@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Modal, ModalProps } from ".";
 
-import { useAuthContext } from "@/context";
+import { useAuthContext, useNotificationContext } from "@/context";
 import { socket } from "@/lib/socket";
 import { WaitingGameT } from "@/types";
 
@@ -20,8 +20,7 @@ export const JoinGameModal = ({
   const [games, setGames] = useState<WaitingGameT[]>([]);
   const [selected, setSelected] = useState<WaitingGameT>();
   const { user } = useAuthContext();
-
-  console.log(games);
+  const { notify } = useNotificationContext();
 
   const handleSubmit = () => {
     if (selected && user) {
@@ -39,6 +38,7 @@ export const JoinGameModal = ({
   useEffect(() => {
     socket.on("waitingGames", setGames);
     socket.on("playerJoined", handleJoin);
+    socket.on("joinGameError", notify);
     socket.emit("getWaitingGames");
 
     return () => {
