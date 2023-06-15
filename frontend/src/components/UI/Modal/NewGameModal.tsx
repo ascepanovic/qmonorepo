@@ -6,7 +6,6 @@ import { Modal, ModalProps } from ".";
 import { useAuthContext } from "@/context";
 import { useCategories } from "@/hooks";
 import { socket } from "@/lib/socket";
-import { GameT } from "@/types";
 
 type Props = Pick<ModalProps, "setVisibility" | "visible">;
 
@@ -23,14 +22,18 @@ export const NewGameModal = ({ setVisibility, visible }: Props) => {
     }
   };
 
-  const handleCreateGame = ({ id }: GameT) => {
-    navigate(`/room/${id}`);
+  const handleCreateGame = () => {
+    navigate(`/room`);
   };
 
   useEffect(() => {
     socket.on("gameCreated", handleCreateGame);
+    socket.on("joinGameError", (error) => {
+      console.log(error);
+    });
     return () => {
       socket.off("gameCreated");
+      socket.off("joinGameError");
     };
   }, []);
 
