@@ -121,6 +121,7 @@ export function initializeSocketIO(server: any) {
             });
           }
           if (currentQuestionNumber >= maxQuestions) {
+            await update(gameId, GameStatus.Finished);
             io.to(socketId).emit("gameEnded");
           }
         }
