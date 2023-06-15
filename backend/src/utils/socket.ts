@@ -152,8 +152,6 @@ export function initializeSocketIO(server: any) {
 let timer: NodeJS.Timeout;
 
 function startTimer(duration: number, callback: () => void) {
-  timer = setTimeout(() => {
-    clearTimeout(timer);
-    callback();
-  }, duration * 1000);
+  clearTimeout(timer);
+  timer = setTimeout(callback, duration * 1000);
 }
