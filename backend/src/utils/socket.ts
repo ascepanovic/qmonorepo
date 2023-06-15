@@ -71,14 +71,14 @@ export function initializeSocketIO(server: any) {
 
           const players = await getPlayersInGame(gameId);
           const categoryId = await findCategoryIdByGame(gameId);
-          if (players.length === 4 && categoryId) {
+          if (players.length === 2 && categoryId) {
             await update(gameId, GameStatus.Active);
             const question = await getRandomQuestion(+categoryId);
 
             if (question) {
               currentQuestionNumber = 1;
               io.to(game.socket_id).emit("gameStarted", question);
-
+              io.to(game.socket_id).emit("playersInGame", players);
               startTimer(10, () => {
                 io.to(game.socket_id).emit("timerExpired");
               });
@@ -96,6 +96,7 @@ export function initializeSocketIO(server: any) {
           userId
         );
         if (gameId && socketId && categoryId) {
+          const players = await getPlayersInGame(gameId);
           const question = await getRandomQuestion(categoryId);
           const answer = await findAnswerById(answerId);
           if (question && answer?.is_correct === true) {
@@ -124,6 +125,7 @@ export function initializeSocketIO(server: any) {
             currentQuestionNumber = 0;
             await update(gameId, GameStatus.Finished);
             clearTimeout(timer);
+            io.to(socketId).emit("playersInGame", players);
             io.to(socketId).emit("gameEnded");
           }
         }
