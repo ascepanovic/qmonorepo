@@ -180,6 +180,33 @@ export async function findCategoryIdByGame(gameId: number) {
   return categoryId;
 }
 
+export async function findGameDataByUserId(userId: number) {
+  const game = await prisma.games.findFirst({
+    where: {
+      game_status: "ACTIVE",
+      game_users: {
+        some: {
+          user_id: userId,
+        },
+      },
+    },
+    include: {
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
+  });
+
+  const gameData = {
+    gameId: game?.id,
+    socketId: game?.socket_id,
+    categoryId: game?.categories.map((e) => e.category_id)[0],
+  };
+  return gameData;
+}
+
 export enum GameStatus {
   Active = "ACTIVE",
   Waiting = "WAITING",

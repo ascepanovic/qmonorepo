@@ -10,6 +10,7 @@ import {
   getWaitingGames,
   updateScore,
   findCategoryIdByGame,
+  findGameDataByUserId,
 } from "../services/game.service";
 import { findAnswerById } from "../services/answer.service";
 import { getRandomQuestion } from "../services/question.service";
@@ -89,46 +90,44 @@ export function initializeSocketIO(server: any) {
       }
     });
 
-    socket.on(
-      "answer",
-      async (gameId: number, userId: number, answerId: number) => {
-        try {
-          const game = await findById(gameId);
-          const categoryId = await findCategoryIdByGame(gameId);
-          if (game && game.game_status === GameStatus.Active && categoryId) {
-            const question = await getRandomQuestion(categoryId);
-            const answer = await findAnswerById(answerId);
-            if (question && answer?.is_correct === true) {
-              await updateScore(gameId, userId, true);
-              io.to(game.socket_id).emit("answerResult", {
-                userId,
-                isCorrect: true,
-              });
-            } else {
-              await updateScore(gameId, userId, false);
-              io.to(game.socket_id).emit("answerResult", {
-                userId,
-                isCorrect: false,
-              });
-            }
-
-            if (question) {
-              currentQuestionNumber++;
-              io.to(game.socket_id).emit("nextQuestion", question);
-
-              startTimer(10, () => {
-                io.to(game.socket_id).emit("timerExpired");
-              });
-            }
-            if (currentQuestionNumber >= maxQuestions) {
-              io.to(game.socket_id).emit("gameEnded");
-            }
+    socket.on("answer", async (userId: number, answerId: number) => {
+      try {
+        const { gameId, socketId, categoryId } = await findGameDataByUserId(
+          userId
+        );
+        if (gameId && socketId && categoryId) {
+          const question = await getRandomQuestion(categoryId);
+          const answer = await findAnswerById(answerId);
+          if (question && answer?.is_correct === true) {
+            await updateScore(gameId, userId, true);
+            io.to(socketId).emit("answerResult", {
+              userId,
+              isCorrect: true,
+            });
+          } else {
+            await updateScore(gameId, userId, false);
+            io.to(socketId).emit("answerResult", {
+              userId,
+              isCorrect: false,
+            });
           }
-        } catch (error) {
-          console.error(`Failed to process answer: ${error}`);
+
+          if (question) {
+            currentQuestionNumber++;
+            io.to(socketId).emit("nextQuestion", question);
+
+            startTimer(10, () => {
+              io.to(socketId).emit("timerExpired");
+            });
+          }
+          if (currentQuestionNumber >= maxQuestions) {
+            io.to(socketId).emit("gameEnded");
+          }
         }
+      } catch (error) {
+        console.error(`Failed to process answer: ${error}`);
       }
-    );
+    });
     socket.on("getOnlineUsers", () => {
       const onlineUsersCount = Object.keys(io.sockets.sockets).length;
       socket.emit("onlineUsersCount", onlineUsersCount);
