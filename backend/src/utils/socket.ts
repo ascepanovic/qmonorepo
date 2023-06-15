@@ -121,6 +121,7 @@ export function initializeSocketIO(server: any) {
             });
           }
           if (currentQuestionNumber >= maxQuestions) {
+            currentQuestionNumber = 0;
             await update(gameId, GameStatus.Finished);
             io.to(socketId).emit("gameEnded");
           }
@@ -147,6 +148,11 @@ export function initializeSocketIO(server: any) {
     });
   });
 }
+
+let timer: NodeJS.Timeout;
 function startTimer(duration: number, callback: () => void) {
-  const timer = setTimeout(callback, duration * 1000);
+  timer = setTimeout(() => {
+    callback();
+    clearTimeout(timer);
+  }, duration * 1000);
 }
