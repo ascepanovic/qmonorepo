@@ -1,20 +1,47 @@
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { useState } from "react";
+import { FaUserAlt } from "react-icons/fa";
+
+import { Button } from "../Button";
+import { UsersModal } from "../Modal";
 
 import { User } from "./User";
 
-import { useLogin, useUser } from "@/api";
+import { auth } from "@/api";
 import { useAuthContext } from "@/context";
+import { useUsers } from "@/hooks";
 
 export const UserIcon = () => {
   const { user, login } = useAuthContext();
 
+  const [visibility, setVisibility] = useState(false);
+
   const loginHandler = ({ credential }: CredentialResponse) => {
-    useLogin({ credential: credential as string }).then(() => {
-      useUser().then((e) => login(e.data));
+    auth.login({ credential: credential as string }).then(() => {
+      auth.user().then((e) => login(e.data));
     });
   };
 
-  if (user) return <User />;
+  const { users } = useUsers();
+
+  if (user)
+    return (
+      <>
+        <div className="flex items-center justify-center gap-8">
+          <Button
+            onClick={() => setVisibility(true)}
+            text={
+              <span className="flex items-center justify-center gap-2">
+                <FaUserAlt></FaUserAlt> <span>{users.length}</span>
+              </span>
+            }
+            className="px-4 py-2"
+          />
+          <User />
+        </div>
+        <UsersModal visible={visibility} setVisibility={setVisibility} />
+      </>
+    );
   return (
     <GoogleLogin
       onSuccess={loginHandler}

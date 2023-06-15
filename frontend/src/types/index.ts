@@ -1,12 +1,7 @@
-export interface UserT {
-  id: number;
-  name: string;
-  email: string;
-  photo: string;
-  createdAt: string;
-  updatedAt: string;
-  iat: number;
-  exp: number;
-}
-
 export * from "./Api";
+export * from "./User";
+export * from "./Category";
+export * from "./Socket";
+export * from "./Game";
+export * from "./Answer";
+export * from "./Question";
