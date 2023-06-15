@@ -5,3 +5,9 @@ export interface GameT {
   game_status: string;
   created_at: string;
 }
+
+export interface WaitingGameT {
+  id: string;
+  category: string;
+  playerCount: number;
+}
