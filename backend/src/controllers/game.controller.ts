@@ -5,7 +5,6 @@ import {
   findAll,
   create,
   update,
-  getPlayersInGame,
 } from "./../services/game.service";
 import { handleResponseError } from "../utils/global";
 import { UserInterface } from "../services/user.service";
@@ -15,7 +14,11 @@ export const findAllGamesController = async (
   res: Response
 ): Promise<void> => {
   try {
-    const games = await findAll();
+    const gamesPerPage = 10;
+    const page = req.query.page || 1;
+    const offset = (+page - 1) * gamesPerPage;
+
+    const games = await findAll(gamesPerPage, offset);
     res.status(200).send(games);
   } catch (error) {
     handleResponseError(res, error);

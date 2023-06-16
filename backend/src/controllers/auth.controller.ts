@@ -5,7 +5,7 @@ import { findOrCreate } from "../services/user.service";
 import { handleResponseError } from "../utils/global";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
+const cookieExpiration = process.env.COOKIE_EXPIRATION || 86400000;
 const oAuth2Client = new OAuth2Client(CLIENT_ID);
 
 export const signInWithGoogle = async (req: Request, res: Response) => {
@@ -27,7 +27,7 @@ export const signInWithGoogle = async (req: Request, res: Response) => {
         .cookie("token", token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
-          expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          expires: new Date(Date.now() + +cookieExpiration),
         })
         .status(200)
         .json({ message: "Logged in successfully!" });
@@ -60,7 +60,7 @@ export const testUser = async (req: any, res: Response) => {
     .cookie("token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      expires: new Date(Date.now() + +cookieExpiration),
     })
     .status(200)
     .json({ message: "Logged in successfully!" });

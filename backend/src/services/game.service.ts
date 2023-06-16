@@ -1,14 +1,18 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "../utils/prisma";
 
-export async function findAll() {
+export async function findAll(limit: number, offset: number) {
   return await prisma.games.findMany({
+    take: limit,
+    skip: offset,
     include: {
       game_users: {
         include: {
           user: true,
         },
       },
+    },
+    orderBy: {
+      created_at: "desc",
     },
   });
 }
@@ -116,7 +120,7 @@ export async function deleteGame(id: number) {
 }
 export async function getWaitingGames() {
   const games = await prisma.games.findMany({
-    where: { game_status: "WAITING" },
+    where: { game_status: GameStatus.Waiting },
     include: {
       game_users: {
         include: {
@@ -183,7 +187,7 @@ export async function findCategoryIdByGame(gameId: number) {
 export async function findGameDataByUserId(userId: number) {
   const game = await prisma.games.findFirst({
     where: {
-      game_status: "ACTIVE",
+      game_status: GameStatus.Active,
       game_users: {
         some: {
           user_id: userId,

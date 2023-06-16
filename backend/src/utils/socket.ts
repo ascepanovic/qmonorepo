@@ -18,7 +18,9 @@ import { checkUserGameStatus, getUserPoints } from "../services/user.service";
 
 dotenv.config();
 let currentQuestionNumber = 0;
-let maxQuestions = 4;
+const maxQuestions = process.env.MAX_QUESTIONS || 4;
+const maxPlayers = process.env.MAX_PLAYERS || 2;
+
 export function initializeSocketIO(server: any) {
   const io = new Server(server, {
     cors: {
@@ -71,7 +73,7 @@ export function initializeSocketIO(server: any) {
 
           const players = await getPlayersInGame(gameId);
           const categoryId = await findCategoryIdByGame(gameId);
-          if (players.length === 2 && categoryId) {
+          if (players.length === +maxPlayers && categoryId) {
             await update(gameId, GameStatus.Active);
             const question = await getRandomQuestion(+categoryId);
 
@@ -121,7 +123,7 @@ export function initializeSocketIO(server: any) {
               io.to(socketId).emit("timerExpired");
             });
           }
-          if (currentQuestionNumber >= maxQuestions) {
+          if (currentQuestionNumber >= +maxQuestions) {
             currentQuestionNumber = 0;
             await update(gameId, GameStatus.Finished);
             clearTimeout(timer);

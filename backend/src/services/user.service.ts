@@ -1,4 +1,3 @@
-import { error } from "console";
 import { prisma } from "../utils/prisma"; // import your prisma instance
 import { GameStatus } from "./game.service";
 
@@ -98,7 +97,7 @@ export async function checkUserGameStatus(userId: number) {
     where: {
       OR: [
         {
-          game_status: "WAITING",
+          game_status: GameStatus.Waiting,
           game_users: {
             some: {
               user_id: userId,
@@ -106,7 +105,7 @@ export async function checkUserGameStatus(userId: number) {
           },
         },
         {
-          game_status: "ACTIVE",
+          game_status: GameStatus.Active,
           game_users: {
             some: {
               user_id: userId,
