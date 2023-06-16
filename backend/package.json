@@ -9,7 +9,8 @@
     "build": "tsc -p .",
     "db:migrate": "npx prisma migrate dev --name init",
     "db:generate": "npx prisma generate",
-    "db:push": "npx prisma db push"
+    "db:push": "npx prisma db push",
+    "seed": "ts-node prisma/seeder.ts"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.3",
@@ -41,6 +42,7 @@
     "passport-google-oauth20": "^2.0.0",
     "socket.io": "^4.6.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^4.6.3"
+    "swagger-ui-express": "^4.6.3",
+    "ts-node": "^10.9.1"
   }
 }

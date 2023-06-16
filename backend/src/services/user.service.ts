@@ -1,4 +1,5 @@
 import { prisma } from "../utils/prisma"; // import your prisma instance
+import { GameStatus } from "./game.service";
 
 export interface UserInterface {
   id: number;
@@ -72,4 +73,48 @@ export async function deleteUser(id: number) {
   return await prisma.users.delete({
     where: { id },
   });
+}
+export async function getUserPoints(userId: number): Promise<number> {
+  let totalPoints = 0;
+  const user = await prisma.users.findUnique({
+    where: { id: userId },
+    select: {
+      games: {
+        select: { points: true },
+      },
+    },
+  });
+
+  if (user) {
+    totalPoints = user.games.reduce((sum, game) => sum + game.points, 0);
+    return totalPoints;
+  } else {
+    throw new Error("User not found");
+  }
+}
+export async function checkUserGameStatus(userId: number) {
+  const game = await prisma.games.findFirst({
+    where: {
+      OR: [
+        {
+          game_status: GameStatus.Waiting,
+          game_users: {
+            some: {
+              user_id: userId,
+            },
+          },
+        },
+        {
+          game_status: GameStatus.Active,
+          game_users: {
+            some: {
+              user_id: userId,
+            },
+          },
+        },
+      ],
+    },
+  });
+
+  return game?.game_status || null;
 }

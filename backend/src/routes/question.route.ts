@@ -14,7 +14,7 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /question:
+ * /api/question:
  *   get:
  *     summary: Get all questions
  *     tags: [Question]
@@ -27,7 +27,7 @@ router.use(isAuthorized);
 router.get("/", getAllQuestionsController);
 /**
  * @swagger
- * /question/{id}:
+ * /api/question/{id}:
  *   get:
  *     summary: Get a question by ID
  *     tags: [Question]
@@ -47,7 +47,7 @@ router.get("/", getAllQuestionsController);
 router.get("/:id", getQuestionByIdController);
 /**
  * @swagger
- * /question:
+ * /api/question:
  *   post:
  *     summary: Create a new question
  *     tags: [Question]
@@ -71,7 +71,7 @@ router.get("/:id", getQuestionByIdController);
 router.post("/", createQuestionController);
 /**
  * @swagger
- * /question/{id}:
+ * /api/question/{id}:
  *   put:
  *     summary: Update a question by ID
  *     tags: [Question]
@@ -102,7 +102,7 @@ router.post("/", createQuestionController);
 router.put("/:id", updateQuestionController);
 /**
  * @swagger
- * /question/{id}:
+ * /api/question/{id}:
  *   delete:
  *     summary: Delete a question by ID
  *     tags: [Question]

@@ -14,7 +14,7 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /category:
+ * /api/category:
  *   get:
  *     summary: Get all categories
  *     tags: [Category]
@@ -28,7 +28,7 @@ router.get("/", getAllCategoryController);
 
 /**
  * @swagger
- * /category/{id}:
+ * /api/category/{id}:
  *   get:
  *     summary: Get a category by ID
  *     tags: [Category]
@@ -49,7 +49,7 @@ router.get("/:id", getCategoryByIdController);
 
 /**
  * @swagger
- * /category:
+ * /api/category:
  *   post:
  *     summary: Create a new category
  *     tags: [Category]
@@ -72,7 +72,7 @@ router.post("/", createCategoryController);
 
 /**
  * @swagger
- * /category/{id}:
+ * /api/category/{id}:
  *   put:
  *     summary: Update a category by ID
  *     tags: [Category]
@@ -105,7 +105,7 @@ router.put("/:id", updateCategoryController);
 
 /**
  * @swagger
- * /category/{id}:
+ * /api/category/{id}:
  *   delete:
  *     summary: Delete a category by ID
  *     tags: [Category]

@@ -16,7 +16,7 @@ export async function findAll() {
     include: { question: true },
   });
 }
-export async function findById(id: number) {
+export async function findAnswerById(id: number) {
   return await prisma.answers.findUnique({
     where: {
       id,

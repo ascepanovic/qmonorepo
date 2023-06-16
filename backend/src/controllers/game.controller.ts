@@ -5,7 +5,6 @@ import {
   findAll,
   create,
   update,
-  getPlayersInGame,
 } from "./../services/game.service";
 import { handleResponseError } from "../utils/global";
 import { UserInterface } from "../services/user.service";
@@ -15,8 +14,11 @@ export const findAllGamesController = async (
   res: Response
 ): Promise<void> => {
   try {
-    const { gameId } = req.body;
-    const games = await getPlayersInGame(gameId);
+    const gamesPerPage = 10;
+    const page = req.query.page || 1;
+    const offset = (+page - 1) * gamesPerPage;
+
+    const games = await findAll(gamesPerPage, offset);
     res.status(200).send(games);
   } catch (error) {
     handleResponseError(res, error);
@@ -63,9 +65,9 @@ export const updateGameController = async (
   res: Response
 ): Promise<void> => {
   const gameId = parseInt(req.params.id);
-  const { created_by } = req.body;
+  const { status } = req.body;
   try {
-    const game = await update(gameId, created_by);
+    const game = await update(gameId, status);
     res.status(200).send(game);
   } catch (error) {
     handleResponseError(res, error);

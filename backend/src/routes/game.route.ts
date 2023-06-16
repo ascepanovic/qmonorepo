@@ -14,7 +14,7 @@ router.use(isAuthorized);
 
 /**
  * @swagger
- * /game:
+ * /api/game:
  *   get:
  *     summary: Get all games
  *     tags: [Game]
@@ -27,7 +27,7 @@ router.use(isAuthorized);
 router.get("/", findAllGamesController);
 /**
  * @swagger
- * /game/{id}:
+ * /api/game/{id}:
  *   get:
  *     summary: Get a game by ID
  *     tags: [Game]
@@ -47,7 +47,7 @@ router.get("/", findAllGamesController);
 router.get("/:id", findGameByIdController);
 /**
  * @swagger
- * /game:
+ * /api/game:
  *   post:
  *     summary: Create a new game
  *     tags: [Game]
@@ -70,10 +70,45 @@ router.get("/:id", findGameByIdController);
  */
 
 router.post("/", isAuthorized, createGameController);
+/**
+ * @swagger
+ * /api/game/{id}:
+ *   put:
+ *     summary: Update a game by ID
+ *     tags: [Game]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID of the game to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *                status:
+ *                 type: string
+ *                 enum:
+ *                   - ACTIVE
+ *                   - WAITING
+ *                   - FINISHED
+ *     responses:
+ *       200:
+ *         description: game updated successfully
+ *       400:
+ *         description: Invalid game data
+ *       404:
+ *         description: game not found
+ */
+router.put("/:id", updateGameController);
 
 /**
  * @swagger
- * /game/{id}:
+ * /api/game/{id}:
  *   delete:
  *     summary: Delete a game by ID
  *     tags: [Game]

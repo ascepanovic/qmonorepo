@@ -1,13 +1,18 @@
 import { prisma } from "../utils/prisma";
 
-export async function findAll() {
+export async function findAll(limit: number, offset: number) {
   return await prisma.games.findMany({
+    take: limit,
+    skip: offset,
     include: {
       game_users: {
         include: {
           user: true,
         },
       },
+    },
+    orderBy: {
+      created_at: "desc",
     },
   });
 }
@@ -16,6 +21,11 @@ export async function findById(id: number) {
   return await prisma.games.findUnique({
     where: { id },
     include: {
+      categories: {
+        include: {
+          category: true,
+        },
+      },
       game_users: {
         include: {
           user: true,
@@ -85,11 +95,13 @@ export async function assignToGame(gameId: number, userId: number) {
   return assignedUser;
 }
 
-export async function update(id: number, created_by: number) {
+export async function update(id: number, status: GameStatus) {
   return await prisma.games.update({
     where: { id },
     data: {
-      created_by,
+      game_status: {
+        set: status,
+      },
     },
   });
 }
@@ -105,4 +117,102 @@ export async function deleteGame(id: number) {
   return await prisma.games.delete({
     where: { id },
   });
+}
+export async function getWaitingGames() {
+  const games = await prisma.games.findMany({
+    where: { game_status: GameStatus.Waiting },
+    include: {
+      game_users: {
+        include: {
+          user: true,
+        },
+      },
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
+  });
+  const waitingGamesWithPlayerCount = games.map((game) => ({
+    id: game.socket_id,
+    category: game.categories.map((e) => e.category?.name)[0],
+    playerCount: game.game_users.map((e) => e.user).length,
+  }));
+
+  return waitingGamesWithPlayerCount;
+}
+export async function updateScore(
+  gameId: number,
+  userId: number,
+  isCorrect: boolean
+): Promise<void> {
+  if (isCorrect) {
+    try {
+      const gameByUser = await prisma.games_by_user.findFirst({
+        where: {
+          game_id: gameId,
+          user_id: userId,
+        },
+        select: {
+          id: true,
+        },
+      });
+
+      if (gameByUser?.id)
+        await prisma.games_by_user.update({
+          where: {
+            id: gameByUser.id,
+          },
+          data: {
+            points: {
+              increment: 1,
+            },
+          },
+        });
+    } catch (error) {
+      console.error(`Failed to update score: ${error}`);
+      throw new Error("Failed to update score");
+    }
+  }
+}
+export async function findCategoryIdByGame(gameId: number) {
+  const game = await findById(gameId);
+  const categoryId = game?.categories
+    .map((e) => e.category?.id)
+    .find((id) => id !== undefined);
+  return categoryId;
+}
+
+export async function findGameDataByUserId(userId: number) {
+  const game = await prisma.games.findFirst({
+    where: {
+      game_status: GameStatus.Active,
+      game_users: {
+        some: {
+          user_id: userId,
+        },
+      },
+    },
+    include: {
+      categories: {
+        include: {
+          category: true,
+        },
+      },
+    },
+  });
+
+  const gameData = {
+    gameId: game?.id,
+    socketId: game?.socket_id,
+    categoryId: game?.categories.map((e) => e.category_id)[0],
+  };
+  return gameData;
+}
+
+export enum GameStatus {
+  Active = "ACTIVE",
+  Waiting = "WAITING",
+  Finished = "FINISHED",
 }
