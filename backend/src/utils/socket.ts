@@ -131,7 +131,9 @@ export function initializeSocketIO(server: any) {
 
             if (question) {
               currentQuestionNumber++;
-              io.to(socketId).emit("nextQuestion", question);
+              startTimer(questionTimer, () => {
+                io.to(socketId).emit("nextQuestion", question);
+              });
 
               startTimer(questionTimer, async () => {
                 io.to(socketId).emit("questionTimerExpired");
