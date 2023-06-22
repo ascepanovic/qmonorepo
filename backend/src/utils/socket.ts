@@ -170,8 +170,9 @@ function startTimer(duration: number, callback: () => void) {
 async function endGame(gameId: number, socketId: string, io: any) {
   currentQuestionNumber = 0;
   await update(gameId, GameStatus.Finished);
-  clearTimeout(timer);
   const playersScore = await getPlayersScore(gameId);
-  io.to(socketId).emit("scoreBoard", playersScore);
-  io.to(socketId).emit("gameEnded");
+  startTimer(questionTimer, async () => {
+    io.to(socketId).emit("scoreBoard", playersScore);
+    io.to(socketId).emit("gameEnded");
+  });
 }
