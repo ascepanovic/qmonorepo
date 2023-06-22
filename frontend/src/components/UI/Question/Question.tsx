@@ -9,7 +9,7 @@ import { QuestionT } from "@/types";
 export const Question = () => {
   const { user } = useAuthContext();
   const { notify } = useNotificationContext();
-
+  const [disabled, setDisabled] = useState(false);
   const [question, setQuestion] = useState<QuestionT>();
 
   const handleAnswer = (id: number) => {
@@ -20,6 +20,10 @@ export const Question = () => {
   useEffect(() => {
     socket.on("gameStarted", (question) => {
       setQuestion(question);
+    });
+    socket.on("answerResult", () => {
+      console.log("answerResult");
+      setDisabled(true);
     });
     socket.on("nextQuestion", (question) => {
       setQuestion(question);

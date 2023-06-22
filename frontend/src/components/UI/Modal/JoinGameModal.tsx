@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Modal, ModalProps } from ".";
 
+import { ROUTES } from "@/constants";
 import { useAuthContext, useNotificationContext } from "@/context";
 import { socket } from "@/lib/socket";
 import { WaitingGameT } from "@/types";
@@ -24,26 +25,19 @@ export const JoinGameModal = ({
 
   const handleSubmit = () => {
     if (selected && user) {
-      socket.emit("joinGame", +selected.id, user.id);
-      navigate(`/room/${selected.id}`);
+      socket.emit("joinGame", selected.id, user.id);
       setVisibility(false);
+      navigate(ROUTES.ROOM);
     }
-  };
-
-  const handleJoin = (userId: number) => {
-    if (user && userId === user.id && selected)
-      navigate(`/room/${selected.id}`);
   };
 
   useEffect(() => {
     socket.on("waitingGames", setGames);
-    socket.on("playerJoined", handleJoin);
     socket.on("joinGameError", notify);
     socket.emit("getWaitingGames");
 
     return () => {
       socket.off("waitingGames");
-      socket.off("playerJoined");
     };
   }, []);
 

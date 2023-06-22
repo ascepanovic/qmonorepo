@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Modal, ModalProps } from ".";
 
+import { ROUTES } from "@/constants";
 import { useAuthContext, useNotificationContext } from "@/context";
 import { useCategories } from "@/hooks";
 import { socket } from "@/lib/socket";
@@ -25,7 +26,8 @@ export const NewGameModal = ({ setVisibility, visible }: Props) => {
   };
 
   const handleCreateGame = () => {
-    navigate(`/room`);
+    console.log("HandleCreateGame");
+    navigate(ROUTES.ROOM);
   };
 
   useEffect(() => {

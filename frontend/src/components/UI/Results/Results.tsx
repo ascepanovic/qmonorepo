@@ -1,0 +1,122 @@
+import { useNavigate } from "react-router-dom";
+
+import { Button } from "../Button";
+
+import First from "@/assets/images/prize/1st-prize-icon.svg";
+import Second from "@/assets/images/prize/2nd-prize-icon.svg";
+import Third from "@/assets/images/prize/3rd-prize-icon.svg";
+import User from "@/assets/images/user_placeholder.png";
+import { ROUTES } from "@/constants";
+
+export const Results = () => {
+  const navigate = useNavigate();
+
+  const user = {
+    photo: User,
+  };
+  return (
+    <>
+      <div
+        className={`fixed left-1/2 top-1/2 z-50 flex w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center outline-none focus:outline-none`}
+      >
+        <div className="mx-auto rounded-lg bg-main-bg px-10 py-10 shadow-[0_0_20px_10px_#2AE78B]">
+          <div className="bg-white flex w-full flex-col items-center gap-10 rounded-lg md:gap-20">
+            <div className="flex flex-auto justify-evenly gap-4">
+              <div className="mt-4 flex flex-col items-center gap-4">
+                <img
+                  src={user?.photo}
+                  alt=""
+                  className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_silver]"
+                />
+                <img
+                  src={Second}
+                  alt=""
+                  className="w-22 h-20 md:h-52 md:w-52"
+                />
+              </div>
+              <div className="flex flex-col items-center gap-4">
+                <img
+                  src={user?.photo}
+                  alt=""
+                  className="h-10 w-10 rounded-full border-2 border-[black]   shadow-[0_0_0_4px_gold]"
+                />
+                <img src={First} alt="" className="w-22 h-20 md:h-52 md:w-52" />
+              </div>
+              <div className="mt-6 flex flex-col items-center gap-4">
+                <div className="flex gap-4">
+                  <img
+                    src={user?.photo}
+                    alt=""
+                    className="h-10 w-10 rounded-full border-2 border-[black]   shadow-[0_0_0_4px_chocolate]"
+                  />
+                  <img
+                    src={user?.photo}
+                    alt=""
+                    className="h-10 w-10 rounded-full border-2 border-[black]   shadow-[0_0_0_4px_chocolate]"
+                  />
+                </div>
+
+                <img src={Third} alt="" className="w-22 h-20 md:h-52 md:w-52" />
+              </div>
+            </div>
+            <div className="flex flex-col gap-6">
+              {" "}
+              <div className="flex items-center justify-center gap-7 text-main">
+                <img
+                  src={user?.photo}
+                  alt=""
+                  className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_gold] md:h-14   md:w-14"
+                />
+                <div className="flex flex-col">
+                  <p>Radule Bulatovic</p>
+                  <p>Points: 7</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-7 text-main">
+                <img
+                  src={user?.photo}
+                  alt=""
+                  className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_silver] md:h-14   md:w-14"
+                />
+                <div className="flex flex-col">
+                  <p>Radule Bulatovic</p>
+                  <p>Points: 7</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-7 text-main">
+                <img
+                  src={user?.photo}
+                  alt=""
+                  className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_chocolate] md:h-14   md:w-14"
+                />
+                <div className="flex flex-col">
+                  <p>Radule Bulatovic</p>
+                  <p>Points: 7</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-center gap-7 text-main">
+                <img
+                  src={user?.photo}
+                  alt=""
+                  className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_chocolate] md:h-14   md:w-14"
+                />
+                <div className="flex flex-col">
+                  <p>Radule Bulatovic</p>
+                  <p>Points: 7</p>
+                </div>
+              </div>
+            </div>
+            <Button
+              className="w-3/4 py-2"
+              text="Home"
+              onClick={() => navigate(ROUTES.INDEX)}
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className={`fixed inset-0 z-40 bg-[#000000]  opacity-50 transition-opacity ease-in-out`}
+      ></div>
+    </>
+  );
+};

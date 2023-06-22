@@ -81,8 +81,12 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 });
 
 const port = process.env.PORT || 3000;
-server.listen(port, () => {
-  console.log(`Server started on port: ${port}`);
+const ioPort = process.env.IO_PORT || 4000;
+app.listen(port, () => {
+  console.log(`App started on port: ${port}`);
   connectDB();
+});
+server.listen(ioPort, () => {
+  console.log(`IO-Server started on port: ${ioPort}`);
   initializeSocketIO(server);
 });

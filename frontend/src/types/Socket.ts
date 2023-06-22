@@ -13,12 +13,15 @@ export interface ServerToClientEvents {
   userPoints: (points: number) => void;
   gameEnded: () => void;
   playersInGame: (players: UserT[]) => void;
+  fistQuestionTimerExpired: () => void;
+  questionTimerExpired: () => void;
+  scoreBoard: (scores: any[]) => void;
 }
 
 export interface ClientToServerEvents {
   createGame: (payload: { userId: number; categoryId: number }) => void;
   getWaitingGames: () => void;
-  joinGame: (gameId: number, userId: number) => void;
+  joinGame: (gameId: string, userId: number) => void;
   answer: (userId: number, answerId: number) => void;
   getOnlineUsers: () => void;
   getUserPoints: (userId: number) => void;

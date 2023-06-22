@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 export type ModalProps = {
   visible: boolean;
   setVisibility: (value: boolean) => void;
-  title: ReactNode;
+  title?: ReactNode;
   body: ReactNode;
   submitHandler?: () => void;
   submitText?: ReactNode;
@@ -29,7 +29,7 @@ export const Modal = ({
           <div className="bg-white  flex w-full flex-col rounded-lg border-0 shadow-lg outline-none focus:outline-none">
             {/*header*/}
             <div className="flex items-start justify-between rounded-t border-b border-solid border-main p-5 px-10">
-              <h3 className="text-2xl ">{title}</h3>
+              <h3 className="text-2xl ">{title || ""}</h3>
               <button
                 className="border-1
                     float-right  text-2xl  transition-colors ease-in-out  hover:text-main"
