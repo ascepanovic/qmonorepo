@@ -48,8 +48,8 @@ export function initializeSocketIO(server: any) {
           }
           const game = await create(socket.id, +categoryId, +userId);
 
-          startTimer(gameDuration, async () => {
-            await endGame(game.id, game.socket_id, io);
+          gameTimer = setTimeout(async () => {
+            await update(game.id, GameStatus.Finished);
           });
 
           socket.join(game.socket_id);
@@ -85,6 +85,7 @@ export function initializeSocketIO(server: any) {
             const categoryId = await findCategoryIdByGame(gameId);
             if (players.length === +maxPlayers && categoryId) {
               await update(gameId, GameStatus.Active);
+              clearTimeout(gameTimer);
               const question = await getRandomQuestion(+categoryId);
 
               if (question) {
