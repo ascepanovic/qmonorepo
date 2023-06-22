@@ -94,7 +94,7 @@ export function initializeSocketIO(server: any) {
                 io.to(game.socket_id).emit("playersInGame", players);
 
                 startTimer(questionTimer, async () => {
-                  io.to(game.socket_id).emit("fistQuestionTimerExpired");
+                  io.to(game.socket_id).emit("questionTimerExpired");
                   io.to(game.socket_id).emit("answerResult", {
                     userId,
                     isCorrect: false,
