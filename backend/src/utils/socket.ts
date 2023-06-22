@@ -95,10 +95,6 @@ export function initializeSocketIO(server: any) {
 
                 startTimer(questionTimer, async () => {
                   io.to(game.socket_id).emit("questionTimerExpired");
-                  io.to(game.socket_id).emit("answerResult", {
-                    userId,
-                    isCorrect: false,
-                  });
                 });
               }
             }
@@ -122,11 +118,6 @@ export function initializeSocketIO(server: any) {
                 userId,
                 isCorrect: true,
               });
-            } else {
-              io.to(socketId).emit("answerResult", {
-                userId,
-                isCorrect: false,
-              });
             }
 
             if (question) {
@@ -137,10 +128,6 @@ export function initializeSocketIO(server: any) {
 
               startTimer(questionTimer, async () => {
                 io.to(socketId).emit("questionTimerExpired");
-                io.to(socketId).emit("answerResult", {
-                  userId,
-                  isCorrect: false,
-                });
 
                 if (currentQuestionNumber >= +maxQuestions) {
                   endGame(gameId, socketId, io);
