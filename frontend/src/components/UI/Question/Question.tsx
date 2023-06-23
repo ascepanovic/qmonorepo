@@ -13,24 +13,26 @@ export const Question = () => {
   const [question, setQuestion] = useState<QuestionT>();
 
   const handleAnswer = (id: number) => {
+    setDisabled(true);
     socket.emit("answer", user!.id, id);
     socket.emit("getUserPoints", user!.id);
   };
 
+  const nextQuestionHandler = (question: QuestionT) => {
+    setDisabled(false);
+    setQuestion(question);
+  };
+
   useEffect(() => {
-    socket.on("gameStarted", (question) => {
-      setQuestion(question);
-    });
-    socket.on("answerResult", () => {
-      console.log("answerResult");
+    socket.on("gameStarted", setQuestion);
+    socket.on("nextQuestion", nextQuestionHandler);
+    socket.on("timerExpired", () => {
       setDisabled(true);
+      return notify("Timer expired!");
     });
-    socket.on("nextQuestion", (question) => {
-      setQuestion(question);
-    });
-    socket.on("timerExpired", () => notify("Timer expired!"));
     return () => {
-      socket.off("gameStarted");
+      socket.off("gameStarted", setQuestion);
+      socket.off("nextQuestion", nextQuestionHandler);
     };
   }, []);
 
@@ -43,13 +45,21 @@ export const Question = () => {
         <>
           <p className="w-2/3 text-center">{question.text}</p>
           <div className="grid grid-cols-2 gap-4">
-            {question.answers.map(({ id, text }) => (
-              <Button
-                text={text}
-                key={id}
-                onClick={() => handleAnswer(id)}
-                className="px-6 py-4"
-              />
+            {question.answers.map(({ id, text, is_correct }) => (
+              <div key={id}>
+                <Button
+                  text={text}
+                  onClick={() => handleAnswer(id)}
+                  className={`px-6 py-4 ${
+                    disabled
+                      ? is_correct
+                        ? "shadow-[0_0_0_6px_#2AE78B]"
+                        : "shadow-[0_0_0_6px_#D70040]"
+                      : ""
+                  }`}
+                  disabled={disabled}
+                />
+              </div>
             ))}
           </div>
         </>

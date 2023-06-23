@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { FaStopwatch } from "react-icons/fa";
 
 import { useTimer } from "@/hooks";
@@ -15,13 +15,17 @@ export const Timer = () => {
     time: ROUND_TIME,
   });
 
+  const [started, setStarted] = useState(false);
+
   useEffect(() => {
-    socket.on("gameStarted", () => {
+    socket.on("gameCreated", () => {
       startGameTimer();
-      startRoundTimer();
     });
 
-    socket.on("nextQuestion", startRoundTimer);
+    socket.on("nextQuestion", () => {
+      setStarted(true);
+      startRoundTimer();
+    });
   }, []);
 
   const renderTimeline = () => {
@@ -36,11 +40,14 @@ export const Timer = () => {
 
   return (
     <div className="flex w-3/4 items-center justify-center gap-4">
-      <div className="flex items-center justify-center gap-4 rounded-lg px-4 py-2 uppercase text-main shadow-[0_0_0_1px_#2AE78B]">
-        <FaStopwatch />
-        <span className="w-8">{gameTime}</span>
-      </div>
-      <div className="flex w-3/4 gap-2">{renderTimeline()}</div>
+      {started ? (
+        <div className="flex w-3/4 gap-2">{renderTimeline()}</div>
+      ) : (
+        <div className="flex items-center justify-center gap-4 rounded-lg px-4 py-2 uppercase text-main shadow-[0_0_0_1px_#2AE78B]">
+          <FaStopwatch />
+          <span className="w-8">{gameTime}</span>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,12 +3,10 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useState,
 } from "react";
 
-import { socket } from "@/lib/socket";
 import { UserT } from "@/types";
 
 type AuthContextType = {
@@ -40,13 +38,6 @@ export const AuthProvider = ({ children }: AuthContextProps) => {
 
   const login = useCallback((user: UserT) => setUser(user), []);
   const logout = useCallback(() => setUser(null), []);
-
-  useEffect(() => {
-    if (user) socket.connect();
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket, user]);
 
   const value = useMemo(
     () => ({

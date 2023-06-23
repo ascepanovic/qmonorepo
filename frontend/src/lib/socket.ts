@@ -9,5 +9,6 @@ export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(
     rejectUnauthorized: false,
     autoConnect: false,
     withCredentials: true,
+    upgrade: false,
   },
 );

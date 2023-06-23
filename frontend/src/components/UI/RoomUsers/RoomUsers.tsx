@@ -14,6 +14,9 @@ export const RoomUsers = ({ users }: RoomUsersProps) => {
   useEffect(() => {
     if (users.length) socket.emit("getUserPoints", users[0].id);
     socket.on("userPoints", setPoints);
+    return () => {
+      socket.off("userPoints", setPoints);
+    };
   }, [users]);
 
   return (

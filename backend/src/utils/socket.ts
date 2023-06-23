@@ -26,6 +26,8 @@ const questionTimer = parseInt(`${process.env.QUESTION_TIMER}`) || 5;
 
 export function initializeSocketIO(server: any) {
   const io = new Server(server, {
+    allowUpgrades: false,
+    transports: ["websocket", "polling"],
     cors: {
       origin: process.env.FRONTEND_ORIGIN,
       methods: ["GET", "POST"],
@@ -49,7 +51,6 @@ export function initializeSocketIO(server: any) {
           const game = await create(socket.id, +categoryId, +userId);
 
           gameTimer = setTimeout(async () => {
-            console.log("gameFinnished");
             await update(game.id, GameStatus.Finished);
           }, gameDuration * 1000);
 
@@ -91,15 +92,11 @@ export function initializeSocketIO(server: any) {
 
               if (question) {
                 currentQuestionNumber = 1;
-                io.to(game.socket_id).emit("gameStarted", question);
+                io.to(game.socket_id).emit("nextQuestion", question);
                 io.to(game.socket_id).emit("playersInGame", players);
 
                 startTimer(questionTimer, async () => {
                   io.to(game.socket_id).emit("fistQuestionTimerExpired");
-                  io.to(game.socket_id).emit("answerResult", {
-                    userId,
-                    isCorrect: false,
-                  });
                 });
               }
             }
@@ -123,11 +120,6 @@ export function initializeSocketIO(server: any) {
                 userId,
                 isCorrect: true,
               });
-            } else {
-              socket.emit("answerResult", {
-                userId,
-                isCorrect: false,
-              });
             }
 
             if (question) {
@@ -138,10 +130,6 @@ export function initializeSocketIO(server: any) {
 
               startTimer(questionTimer, async () => {
                 io.to(socketId).emit("questionTimerExpired");
-                io.to(socketId).emit("answerResult", {
-                  userId,
-                  isCorrect: false,
-                });
 
                 if (currentQuestionNumber >= +maxQuestions) {
                   endGame(gameId, socketId, io);

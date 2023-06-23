@@ -34,8 +34,8 @@ export const NewGameModal = ({ setVisibility, visible }: Props) => {
     socket.on("gameCreated", handleCreateGame);
     socket.on("joinGameError", notify);
     return () => {
-      socket.off("gameCreated");
-      socket.off("joinGameError");
+      socket.off("gameCreated", handleCreateGame);
+      socket.off("joinGameError", notify);
     };
   }, []);
 

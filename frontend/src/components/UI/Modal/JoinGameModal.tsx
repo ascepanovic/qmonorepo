@@ -37,7 +37,7 @@ export const JoinGameModal = ({
     socket.emit("getWaitingGames");
 
     return () => {
-      socket.off("waitingGames");
+      socket.off("waitingGames", setGames);
     };
   }, []);
 
