@@ -91,9 +91,9 @@ export function initializeSocketIO(server: any) {
               io.to(game.socket_id).emit("gameStarted", question);
               io.to(game.socket_id).emit("playersInGame", players);
 
-              startTimer(questionTimer, async () => {
-                io.to(game.socket_id).emit("questionTimerExpired");
-              });
+              // startTimer(questionTimer, async () => {
+              //   io.to(game.socket_id).emit("questionTimerExpired");
+              // });
             }
           }
         }
@@ -115,6 +115,12 @@ export function initializeSocketIO(server: any) {
             io.to(socketId).emit("answerResult", {
               userId,
               isCorrect: true,
+            });
+          } else {
+            await updateScore(gameId, userId, false);
+            io.to(socketId).emit("answerResult", {
+              userId,
+              isCorrect: false,
             });
           }
 
