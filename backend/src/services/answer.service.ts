@@ -21,11 +21,12 @@ export async function findAnswerById(id: number) {
     where: {
       id,
     },
-    include: {
-      question: true,
+    select: {
+      is_correct: true,
     },
   });
 }
+
 export async function update(id: number, answer: any) {
   const existingAnswer = await prisma.answers.findUnique({
     where: { id },

@@ -14,7 +14,10 @@ import {
   getPlayersScore,
 } from "../services/game.service";
 import { findAnswerById } from "../services/answer.service";
-import { getRandomQuestion } from "../services/question.service";
+import {
+  getQuestionsByCategoryId,
+  getRandomQuestion,
+} from "../services/question.service";
 import { checkUserGameStatus, getUserPoints } from "../services/user.service";
 dotenv.config();
 
@@ -76,71 +79,73 @@ export function initializeSocketIO(server: any) {
             await update(gameId, GameStatus.Active);
             clearTimeout(gameTimer);
             io.to(game.socket_id).emit("gameStartCountdown");
-            startTimer(questionTimer, async () => {
-              io.to(game.socket_id).emit("gameStart");
-              const question = await getRandomQuestion(+categoryId);
-              if (question) {
-                currentQuestionNumber = 1;
-                io.to(game.socket_id).emit("nextQuestion", question);
-                io.to(game.socket_id).emit("playersInGame", players);
-                startTimer(questionTimer, async () => {
-                  io.to(game.socket_id).emit("questionTimerExpired");
-                  io.to(game.socket_id).emit("answerResult", {
-                    userId,
-                    isCorrect: false,
-                  });
-                });
-              }
-            });
+
+            handleQuestions(game.socket_id, categoryId, game.id, io);
+            // startTimer(questionTimer, async () => {
+            //   io.to(game.socket_id).emit("gameStart");
+            //   const question = await getRandomQuestion(+categoryId);
+            //   if (question) {
+            //     currentQuestionNumber = 1;
+            //     io.to(game.socket_id).emit("nextQuestion", question);
+            //     io.to(game.socket_id).emit("playersInGame", players);
+            //     startTimer(questionTimer, async () => {
+            //       io.to(game.socket_id).emit("questionTimerExpired");
+            //       io.to(game.socket_id).emit("answerResult", {
+            //         userId,
+            //         isCorrect: false,
+            //       });
+            //     });
+            //   }
+            // });
           }
         }
       } catch (error) {
         console.error(`Failed to join room: ${error}`);
       }
     });
-    socket.on("answer", async (userId: number, answerId: number) => {
-      try {
-        const { gameId, socketId, categoryId } = await findGameDataByUserId(
-          userId
-        );
-        if (gameId && socketId && categoryId) {
-          const question = await getRandomQuestion(categoryId);
-          const answer = await findAnswerById(answerId);
-          if (question && answer?.is_correct === true) {
-            await updateScore(gameId, userId, true);
-            io.to(socketId).emit("answerResult", {
-              userId,
-              isCorrect: true,
-            });
-          } else {
-            await updateScore(gameId, userId, false);
-            io.to(socketId).emit("answerResult", {
-              userId,
-              isCorrect: false,
-            });
-          }
-          if (question) {
-            currentQuestionNumber++;
-            startTimer(questionTimer, () => {
-              io.to(socketId).emit("nextQuestion", question);
-            });
-            startTimer(questionTimer, async () => {
-              io.to(socketId).emit("questionTimerExpired");
-              io.to(socketId).emit("answerResult", {
-                userId,
-                isCorrect: false,
-              });
+    // socket.on("answer", async (userId: number, answerId: number) => {
+    //   try {
+    //     const { gameId, socketId, categoryId } = await findGameDataByUserId(
+    //       userId
+    //     );
+    //     if (gameId && socketId && categoryId) {
+    //       const question = await getRandomQuestion(categoryId);
+    //       const answer = await findAnswerById(answerId);
+    //       if (question && answer?.is_correct === true) {
+    //         await updateScore(gameId, userId, true);
+    //         io.to(socketId).emit("answerResult", {
+    //           userId,
+    //           isCorrect: true,
+    //         });
+    //       } else {
+    //         await updateScore(gameId, userId, false);
+    //         io.to(socketId).emit("answerResult", {
+    //           userId,
+    //           isCorrect: false,
+    //         });
+    //       }
+    //       if (question) {
+    //         currentQuestionNumber++;
+    //         startTimer(questionTimer, () => {
+    //           io.to(socketId).emit("nextQuestion", question);
+    //         });
+    //         startTimer(questionTimer, async () => {
+    //           io.to(socketId).emit("questionTimerExpired");
+    //           io.to(socketId).emit("answerResult", {
+    //             userId,
+    //             isCorrect: false,
+    //           });
 
-              if (currentQuestionNumber >= +maxQuestions) {
-                endGame(gameId, socketId, io);
-              }
-            });
-          }
-        }
-      } catch (error) {
-        console.error(`Failed to process answer: ${error}`);
-      }
-    });
+    //           if (currentQuestionNumber >= +maxQuestions) {
+    //             endGame(gameId, socketId, io);
+    //           }
+    //         });
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error(`Failed to process answer: ${error}`);
+    //   }
+    // });
     socket.on("getOnlineUsers", () => {
       const onlineUsersCount = Object.keys(io.sockets.sockets).length;
       socket.emit("onlineUsersCount", onlineUsersCount);
@@ -174,3 +179,55 @@ async function endGame(gameId: number, socketId: string, io: any) {
     io.to(socketId).emit("gameEnded");
   });
 }
+//////////////////////
+const handleQuestions = async (
+  socketId: string,
+  categoryId: number,
+  gameId: number,
+  io: any
+) => {
+  let currentQuestionNumber = 0;
+  let isAnswered = false;
+  const questions = await getQuestionsByCategoryId(categoryId);
+  if (questions) {
+    const askQuestion = (question: any) => {
+      currentQuestionNumber++;
+      isAnswered = false;
+      io.to(socketId).emit("nextQuestion", {
+        question,
+        currentQuestionNumber,
+      });
+      startTimer(questionTimer, () => {
+        if (!isAnswered) {
+          io.to(socketId).emit("questionTimerExpired");
+        }
+      });
+    };
+
+    const handleAnswer = (userId: number, answerId: number) => {
+      isAnswered = true;
+      clearTimeout(questionTimer);
+
+      const isCorrect = findAnswerById(answerId);
+
+      io.to(socketId).emit("answerResult", {
+        userId,
+        isCorrect,
+      });
+
+      if (currentQuestionNumber < questions.length) {
+        setTimeout(() => {
+          askQuestion(questions[currentQuestionNumber]);
+        }, questionTimer);
+      } else {
+        endGame(gameId, socketId, io);
+      }
+    };
+
+    io.on("answer", (userId: number, answerId: number) => {
+      handleAnswer(userId, answerId);
+    });
+
+    askQuestion(questions[currentQuestionNumber]);
+  }
+};
