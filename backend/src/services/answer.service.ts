@@ -11,13 +11,28 @@ export async function create(answer: any) {
     },
   });
 }
+export async function userAnswer(
+  answerId: number,
+  isCorrect: boolean,
+  gameId: number,
+  userId: number
+) {
+  return await prisma.user_answers.create({
+    data: {
+      answer: answerId,
+      is_correct: isCorrect,
+      game_id: gameId,
+      user_id: userId,
+    },
+  });
+}
 export async function findAll() {
   return await prisma.answers.findMany({
     include: { question: true },
   });
 }
 export async function findAnswerById(id: number) {
-  return await prisma.answers.findUnique({
+  const result = await prisma.answers.findUnique({
     where: {
       id,
     },
@@ -25,6 +40,11 @@ export async function findAnswerById(id: number) {
       is_correct: true,
     },
   });
+  if (result && result.is_correct) {
+    return result.is_correct;
+  } else {
+    return false;
+  }
 }
 
 export async function update(id: number, answer: any) {

@@ -60,6 +60,7 @@ model games {
   created_at  DateTime @default(now())
   game_users  games_by_user[]
   categories  game_category[]
+  user_answers user_answers[]
 }
 
 model games_by_user {
@@ -81,7 +82,20 @@ model users {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-   games      games_by_user[]
+  games      games_by_user[]
+  user_answers user_answers[]
+
+
+}
+model user_answers {
+  id           Int           @id @default(autoincrement())
+  answer       Int?
+  is_correct   Boolean
+  game_id     Int?      @map("game_id")
+  user_id     Int?      @map("user_id")
+  user        users?    @relation(fields: [user_id], references: [id],onDelete: SetNull)
+  game        games?   @relation(fields: [game_id], references: [id],onDelete: SetNull)
+ 
 }
 
 enum Role {

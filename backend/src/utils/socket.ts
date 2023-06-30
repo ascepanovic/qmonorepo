@@ -13,7 +13,7 @@ import {
   findGameDataByUserId,
   getPlayersScore,
 } from "../services/game.service";
-import { findAnswerById } from "../services/answer.service";
+import { findAnswerById, userAnswer } from "../services/answer.service";
 import {
   getQuestionsByCategoryId,
   getRandomQuestion,
@@ -204,11 +204,12 @@ const handleQuestions = async (
       });
     };
 
-    const handleAnswer = (userId: number, answerId: number) => {
+    const handleAnswer = async (userId: number, answerId: number) => {
       isAnswered = true;
       clearTimeout(questionTimer);
 
-      const isCorrect = findAnswerById(answerId);
+      const isCorrect = await findAnswerById(answerId);
+      await userAnswer(answerId, isCorrect, gameId, userId);
 
       io.to(socketId).emit("answerResult", {
         userId,
