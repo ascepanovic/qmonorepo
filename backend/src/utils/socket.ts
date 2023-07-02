@@ -200,21 +200,27 @@ const handleQuestions = async (
       startTimer(questionTimer, () => {
         if (!isAnswered) {
           io.to(socketId).emit("questionTimerExpired");
+          handleAnswer(null, null); // Handle the case when no answer is provided
         }
       });
     };
 
-    const handleAnswer = async (userId: number, answerId: number) => {
+    const handleAnswer = async (
+      userId: number | null,
+      answerId: number | null
+    ) => {
       isAnswered = true;
       clearTimeout(questionTimer);
 
-      const isCorrect = await findAnswerById(answerId);
-      await userAnswer(answerId, isCorrect, gameId, userId);
+      if (userId !== null && answerId !== null) {
+        const isCorrect = await findAnswerById(answerId);
+        await userAnswer(answerId, isCorrect, gameId, userId);
 
-      io.to(socketId).emit("answerResult", {
-        userId,
-        isCorrect,
-      });
+        io.to(socketId).emit("answerResult", {
+          userId,
+          isCorrect,
+        });
+      }
 
       if (currentQuestionNumber < questions.length) {
         setTimeout(() => {
