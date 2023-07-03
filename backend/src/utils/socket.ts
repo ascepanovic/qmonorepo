@@ -142,16 +142,12 @@ const handleQuestions = async (
         currentQuestionNumber,
       });
 
-      const questionTimerExpired = new Promise<void>((resolve) => {
+      if (!isAnswered) {
         setTimeout(() => {
-          if (!isAnswered) {
-            io.to(socketId).emit("questionTimerExpired");
-            resolve();
-          }
+          io.to(socketId).emit("questionTimerExpired");
+          handleAnswer(null, null);
         }, questionTimer);
-      });
-
-      await questionTimerExpired;
+      }
 
       if (currentQuestionNumber < questions.length) {
         await askQuestion(questions[currentQuestionNumber]);
@@ -181,7 +177,8 @@ const handleQuestions = async (
         });
       }
     };
-
-    await askQuestion(questions[currentQuestionNumber]);
+    setTimeout(async () => {
+      await askQuestion(questions[currentQuestionNumber]);
+    }, questionTimer);
   }
 };
