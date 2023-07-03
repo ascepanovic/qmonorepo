@@ -75,7 +75,13 @@ export function initializeSocketIO(server: any) {
             clearTimeout(gameTimer);
             io.to(game.socket_id).emit("gameStartCountdown");
             io.to(game.socket_id).emit("playersInGame", players);
-            await handleQuestions(game.socket_id, categoryId, game.id, io);
+            await handleQuestions(
+              game.socket_id,
+              categoryId,
+              game.id,
+              io,
+              socket
+            );
           }
         }
       } catch (error) {
@@ -120,12 +126,12 @@ const handleQuestions = async (
   socketId: string,
   categoryId: number,
   gameId: number,
-  io: any
+  io: any,
+  socket: any
 ) => {
   let currentQuestionNumber = 0;
   let isAnswered = false;
   const questions = await getQuestionsByCategoryId(categoryId);
-  const questionDelay = 3000;
 
   if (questions) {
     const askQuestion = (question: any) => {
@@ -141,8 +147,11 @@ const handleQuestions = async (
           io.to(socketId).emit("questionTimerExpired");
           handleAnswer(null, null);
         }
-      }, questionDelay);
+      }, questionTimer);
     };
+    socket.on("answer", (userId: number, answerId: number) => {
+      handleAnswer(userId, answerId);
+    });
 
     const handleAnswer = async (
       userId: number | null,
@@ -164,18 +173,14 @@ const handleQuestions = async (
       if (currentQuestionNumber < questions.length) {
         setTimeout(() => {
           askQuestion(questions[currentQuestionNumber]);
-        }, questionDelay);
+        }, questionTimer);
       } else {
         endGame(gameId, socketId, io);
       }
     };
 
-    io.on("answer", (userId: number, answerId: number) => {
-      handleAnswer(userId, answerId);
-    });
-
     setTimeout(() => {
       askQuestion(questions[currentQuestionNumber]);
-    }, questionDelay);
+    }, questionTimer);
   }
 };
