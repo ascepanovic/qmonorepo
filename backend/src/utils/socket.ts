@@ -14,15 +14,10 @@ import {
   getPlayersScore,
 } from "../services/game.service";
 import { findAnswerById, userAnswer } from "../services/answer.service";
-import {
-  getQuestionsByCategoryId,
-  getRandomQuestion,
-} from "../services/question.service";
+import { getQuestionsByCategoryId } from "../services/question.service";
 import { checkUserGameStatus, getUserPoints } from "../services/user.service";
 dotenv.config();
 
-let currentQuestionNumber = 0;
-const maxQuestions = process.env.MAX_QUESTIONS || 4;
 const maxPlayers = process.env.MAX_PLAYERS || 2;
 const gameDuration = parseInt(`${process.env.GAME_DURATION}`) || 60;
 const questionTimer = parseInt(`${process.env.QUESTION_TIMER}`) || 5;
@@ -171,7 +166,6 @@ function startTimer(duration: number, callback: () => void) {
   timer = setTimeout(callback, duration * 1000);
 }
 async function endGame(gameId: number, socketId: string, io: any) {
-  currentQuestionNumber = 0;
   await update(gameId, GameStatus.Finished);
   const playersScore = await getPlayersScore(gameId);
   startTimer(questionTimer, async () => {
@@ -189,6 +183,8 @@ const handleQuestions = async (
   let currentQuestionNumber = 0;
   let isAnswered = false;
   const questions = await getQuestionsByCategoryId(categoryId);
+  const questionDelay = 3000;
+
   if (questions) {
     const askQuestion = (question: any) => {
       currentQuestionNumber++;
@@ -197,12 +193,13 @@ const handleQuestions = async (
         question,
         currentQuestionNumber,
       });
-      startTimer(questionTimer, () => {
+
+      setTimeout(() => {
         if (!isAnswered) {
           io.to(socketId).emit("questionTimerExpired");
-          handleAnswer(null, null); // Handle the case when no answer is provided
+          handleAnswer(null, null);
         }
-      });
+      }, questionDelay);
     };
 
     const handleAnswer = async (
@@ -215,7 +212,7 @@ const handleQuestions = async (
       if (userId !== null && answerId !== null) {
         const isCorrect = await findAnswerById(answerId);
         await userAnswer(answerId, isCorrect, gameId, userId);
-
+        await updateScore(gameId, userId, isCorrect);
         io.to(socketId).emit("answerResult", {
           userId,
           isCorrect,
@@ -225,7 +222,7 @@ const handleQuestions = async (
       if (currentQuestionNumber < questions.length) {
         setTimeout(() => {
           askQuestion(questions[currentQuestionNumber]);
-        }, questionTimer);
+        }, questionDelay);
       } else {
         endGame(gameId, socketId, io);
       }
@@ -235,6 +232,8 @@ const handleQuestions = async (
       handleAnswer(userId, answerId);
     });
 
-    askQuestion(questions[currentQuestionNumber]);
+    setTimeout(() => {
+      askQuestion(questions[currentQuestionNumber]);
+    }, questionDelay);
   }
 };
