@@ -149,8 +149,8 @@ const handleQuestions = async (
         }
       }, questionTimer);
     };
-    socket.on("answer", (userId: number, answerId: number) => {
-      handleAnswer(userId, answerId);
+    socket.on("answer", async (userId: number, answerId: number) => {
+      await handleAnswer(userId, answerId);
     });
 
     const handleAnswer = async (
