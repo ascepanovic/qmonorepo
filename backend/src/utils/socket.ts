@@ -134,7 +134,7 @@ const handleQuestions = async (
   const questions = await getQuestionsByCategoryId(categoryId);
 
   if (questions) {
-    const askQuestion = (question: any) => {
+    const askQuestion = async (question: any) => {
       currentQuestionNumber++;
       isAnswered = false;
       io.to(socketId).emit("nextQuestion", {
@@ -142,13 +142,24 @@ const handleQuestions = async (
         currentQuestionNumber,
       });
 
-      setTimeout(() => {
-        if (!isAnswered) {
-          io.to(socketId).emit("questionTimerExpired");
-          handleAnswer(null, null);
-        }
-      }, questionTimer);
+      const questionTimerExpired = new Promise<void>((resolve) => {
+        setTimeout(() => {
+          if (!isAnswered) {
+            io.to(socketId).emit("questionTimerExpired");
+            resolve();
+          }
+        }, questionTimer);
+      });
+
+      await questionTimerExpired;
+
+      if (currentQuestionNumber < questions.length) {
+        await askQuestion(questions[currentQuestionNumber]);
+      } else {
+        await endGame(gameId, socketId, io);
+      }
     };
+
     socket.on("answer", async (userId: number, answerId: number) => {
       await handleAnswer(userId, answerId);
     });
@@ -169,18 +180,8 @@ const handleQuestions = async (
           isCorrect,
         });
       }
-
-      if (currentQuestionNumber < questions.length) {
-        setTimeout(() => {
-          askQuestion(questions[currentQuestionNumber]);
-        }, questionTimer);
-      } else {
-        endGame(gameId, socketId, io);
-      }
     };
 
-    setTimeout(() => {
-      askQuestion(questions[currentQuestionNumber]);
-    }, questionTimer);
+    await askQuestion(questions[currentQuestionNumber]);
   }
 };
