@@ -74,73 +74,15 @@ export function initializeSocketIO(server: any) {
             await update(gameId, GameStatus.Active);
             clearTimeout(gameTimer);
             io.to(game.socket_id).emit("gameStartCountdown");
-
-            handleQuestions(game.socket_id, categoryId, game.id, io);
-            // startTimer(questionTimer, async () => {
-            //   io.to(game.socket_id).emit("gameStart");
-            //   const question = await getRandomQuestion(+categoryId);
-            //   if (question) {
-            //     currentQuestionNumber = 1;
-            //     io.to(game.socket_id).emit("nextQuestion", question);
-            //     io.to(game.socket_id).emit("playersInGame", players);
-            //     startTimer(questionTimer, async () => {
-            //       io.to(game.socket_id).emit("questionTimerExpired");
-            //       io.to(game.socket_id).emit("answerResult", {
-            //         userId,
-            //         isCorrect: false,
-            //       });
-            //     });
-            //   }
-            // });
+            io.to(game.socket_id).emit("playersInGame", players);
+            await handleQuestions(game.socket_id, categoryId, game.id, io);
           }
         }
       } catch (error) {
         console.error(`Failed to join room: ${error}`);
       }
     });
-    // socket.on("answer", async (userId: number, answerId: number) => {
-    //   try {
-    //     const { gameId, socketId, categoryId } = await findGameDataByUserId(
-    //       userId
-    //     );
-    //     if (gameId && socketId && categoryId) {
-    //       const question = await getRandomQuestion(categoryId);
-    //       const answer = await findAnswerById(answerId);
-    //       if (question && answer?.is_correct === true) {
-    //         await updateScore(gameId, userId, true);
-    //         io.to(socketId).emit("answerResult", {
-    //           userId,
-    //           isCorrect: true,
-    //         });
-    //       } else {
-    //         await updateScore(gameId, userId, false);
-    //         io.to(socketId).emit("answerResult", {
-    //           userId,
-    //           isCorrect: false,
-    //         });
-    //       }
-    //       if (question) {
-    //         currentQuestionNumber++;
-    //         startTimer(questionTimer, () => {
-    //           io.to(socketId).emit("nextQuestion", question);
-    //         });
-    //         startTimer(questionTimer, async () => {
-    //           io.to(socketId).emit("questionTimerExpired");
-    //           io.to(socketId).emit("answerResult", {
-    //             userId,
-    //             isCorrect: false,
-    //           });
 
-    //           if (currentQuestionNumber >= +maxQuestions) {
-    //             endGame(gameId, socketId, io);
-    //           }
-    //         });
-    //       }
-    //     }
-    //   } catch (error) {
-    //     console.error(`Failed to process answer: ${error}`);
-    //   }
-    // });
     socket.on("getOnlineUsers", () => {
       const onlineUsersCount = Object.keys(io.sockets.sockets).length;
       socket.emit("onlineUsersCount", onlineUsersCount);
