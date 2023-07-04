@@ -143,9 +143,9 @@ const handleQuestions = async (
       });
 
       if (!isAnswered) {
-        setTimeout(() => {
+        setTimeout(async () => {
           io.to(socketId).emit("questionTimerExpired");
-          handleAnswer(null, null);
+          await handleAnswer(null, null);
         }, questionTimer);
       }
 
@@ -165,7 +165,6 @@ const handleQuestions = async (
       answerId: number | null
     ) => {
       isAnswered = true;
-      clearTimeout(questionTimer);
 
       if (userId !== null && answerId !== null) {
         const isCorrect = await findAnswerById(answerId);
