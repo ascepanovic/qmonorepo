@@ -1,10 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Modal, ModalProps } from ".";
 
 import { ROUTES } from "@/constants";
-import { useAuthContext, useNotificationContext } from "@/context";
+import { useAuthContext } from "@/context";
 import { useCategories } from "@/hooks";
 import { socket } from "@/lib/socket";
 
@@ -12,7 +12,6 @@ type Props = Pick<ModalProps, "setVisibility" | "visible">;
 
 export const NewGameModal = ({ setVisibility, visible }: Props) => {
   const { categories, isLoading } = useCategories();
-  const { notify } = useNotificationContext();
   const { user } = useAuthContext();
   const navigate = useNavigate();
   const selectRef = useRef<HTMLSelectElement>(null);
@@ -22,22 +21,9 @@ export const NewGameModal = ({ setVisibility, visible }: Props) => {
     if (value && user) {
       socket.emit("createGame", { userId: user.id, categoryId: +value });
       setVisibility(false);
+      navigate(ROUTES.ROOM);
     }
   };
-
-  const handleCreateGame = () => {
-    console.log("HandleCreateGame");
-    navigate(ROUTES.ROOM);
-  };
-
-  useEffect(() => {
-    socket.on("gameCreated", handleCreateGame);
-    socket.on("joinGameError", notify);
-    return () => {
-      socket.off("gameCreated", handleCreateGame);
-      socket.off("joinGameError", notify);
-    };
-  }, []);
 
   return (
     <Modal

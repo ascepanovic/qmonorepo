@@ -4,7 +4,7 @@ import { Button } from "../Button";
 
 import { useAuthContext, useNotificationContext } from "@/context";
 import { socket } from "@/lib/socket";
-import { QuestionT } from "@/types";
+import { QuestionT, ServerToClientEvents } from "@/types";
 
 export const Question = () => {
   const { user } = useAuthContext();
@@ -18,9 +18,11 @@ export const Question = () => {
     socket.emit("getUserPoints", user!.id);
   };
 
-  const nextQuestionHandler = (question: QuestionT) => {
+  const nextQuestionHandler: ServerToClientEvents["nextQuestion"] = ({
+    question,
+  }) => {
     setDisabled(false);
-    setQuestion(question);
+    setQuestion(question.question);
   };
 
   useEffect(() => {

@@ -3,9 +3,18 @@ import { useNavigate } from "react-router-dom";
 
 import { Button } from "../Button";
 
+import First from "@/assets/images/prize/1st-prize-icon.svg";
+import Second from "@/assets/images/prize/2nd-prize-icon.svg";
+import Third from "@/assets/images/prize/3rd-prize-icon.svg";
 import { ROUTES } from "@/constants";
 import { socket } from "@/lib/socket";
 import { UserT } from "@/types";
+
+const PRIZE = [
+  { classes: "", photo: First },
+  { classes: "mt-4", photo: Second },
+  { classes: "mt-6", photo: Third },
+];
 
 export const Results = () => {
   const navigate = useNavigate();
@@ -26,57 +35,35 @@ export const Results = () => {
       >
         <div className="mx-auto rounded-lg bg-main-bg px-10 py-10 shadow-[0_0_20px_10px_#2AE78B]">
           <div className="bg-white flex w-full flex-col items-center gap-10 rounded-lg md:gap-20">
-            {/* <div className="flex flex-auto justify-evenly gap-4">
-              <div className="mt-4 flex flex-col items-center gap-4">
-                <img
-                  src={user?.photo}
-                  alt=""
-                  className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_silver]"
-                />
-                <img
-                  src={Second}
-                  alt=""
-                  className="w-22 h-20 md:h-52 md:w-52"
-                />
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <img
-                  src={user?.photo}
-                  alt=""
-                  className="h-10 w-10 rounded-full border-2 border-[black]   shadow-[0_0_0_4px_gold]"
-                />
-                <img src={First} alt="" className="w-22 h-20 md:h-52 md:w-52" />
-              </div>
-              <div className="mt-6 flex flex-col items-center gap-4">
-                <div className="flex gap-4">
-                  <img
-                    src={user?.photo}
-                    alt=""
-                    className="h-10 w-10 rounded-full border-2 border-[black]   shadow-[0_0_0_4px_chocolate]"
-                  />
-                  <img
-                    src={user?.photo}
-                    alt=""
-                    className="h-10 w-10 rounded-full border-2 border-[black]   shadow-[0_0_0_4px_chocolate]"
-                  />
-                </div>
-
-                <img src={Third} alt="" className="w-22 h-20 md:h-52 md:w-52" />
-              </div>
-            </div> */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-auto justify-evenly gap-4">
               {data.map((user, i) => (
                 <div
-                  key={i}
-                  className="flex items-center justify-center gap-7 text-main"
+                  className={`${PRIZE[i].classes} flex flex-col items-center gap-4`}
+                  key={user.id}
                 >
+                  <img
+                    src={user?.photo}
+                    alt=""
+                    className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_silver]"
+                  />
+                  <img
+                    src={PRIZE[i].photo}
+                    alt=""
+                    className="w-22 h-20 md:h-52 md:w-52"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col gap-6">
+              {data.map((user, i) => (
+                <div key={i} className="flex items-center  gap-7 text-main">
                   <img
                     src={user?.photo}
                     alt=""
                     className="h-10 w-10 rounded-full border-2 border-[black] shadow-[0_0_0_4px_gold] md:h-14   md:w-14"
                   />
                   <div className="flex flex-col">
-                    <p>Radule Bulatovic</p>
+                    <p>{user.name}</p>
                     <p>Points: 7</p>
                   </div>
                 </div>

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
+import { BiRefresh } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
+
+import { Button } from "../Button";
 
 import { Modal, ModalProps } from ".";
 
@@ -46,20 +49,27 @@ export const JoinGameModal = ({
       setVisibility={setVisibility}
       visible={visible}
       body={
-        <div className="flex h-60 flex-col gap-2 overflow-y-auto rounded-lg border-2 border-solid border-main py-2 ">
-          {games.map((game) => (
-            <div
-              key={game.id}
-              className={`flex justify-between px-4 py-2 transition-all ${
-                game.id === selected?.id ? "bg-main text-main-bg" : ""
-              }`}
-              onClick={() => setSelected(game)}
-            >
-              <span>{game.category}</span>
-              <span>{game.playerCount} / 4</span>
-            </div>
-          ))}
-        </div>
+        <>
+          <Button
+            className="p-2 text-3xl"
+            text={<BiRefresh />}
+            onClick={() => socket.emit("getWaitingGames")}
+          ></Button>
+          <div className="flex h-60 flex-col gap-2 overflow-y-auto rounded-lg border-2 border-solid border-main py-2 ">
+            {games.map((game) => (
+              <div
+                key={game.id}
+                className={`flex justify-between px-4 py-2 transition-all ${
+                  game.id === selected?.id ? "bg-main text-main-bg" : ""
+                }`}
+                onClick={() => setSelected(game)}
+              >
+                <span>{game.category}</span>
+                <span>{game.playerCount} / 4</span>
+              </div>
+            ))}
+          </div>
+        </>
       }
       submitHandler={handleSubmit}
       submitText="Join"

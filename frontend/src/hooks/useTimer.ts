@@ -9,6 +9,7 @@ export const useTimer = ({
 }) => {
   const [timer, setTimer] = useState(time);
   const [isRunning, setIsRunning] = useState(false);
+  const [cb, setCb] = useState<() => void | undefined>();
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -23,6 +24,7 @@ export const useTimer = ({
 
     if (timer === 0) {
       if (callback) callback();
+      if (cb) cb();
       stop();
     }
 
@@ -34,6 +36,7 @@ export const useTimer = ({
   }, [isRunning, timer, callback]);
 
   const start = () => {
+    setTimer(time);
     setIsRunning(true);
   };
 
@@ -46,5 +49,5 @@ export const useTimer = ({
     stop();
   };
 
-  return { timer, start, stop, reset };
+  return { timer, start, stop, reset, setCb };
 };

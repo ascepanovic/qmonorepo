@@ -5,15 +5,27 @@ export interface ServerToClientEvents {
   waitingGames: (games: WaitingGameT[]) => void;
   playerJoined: (userId: number) => void;
   gameStarted: (question: QuestionT) => void;
+  gameStartCountdown: () => void;
   timerExpired: () => void;
   answerResult: (result: { userId: number; isCorrect: boolean }) => void;
-  nextQuestion: (question: QuestionT) => void;
+  nextQuestion: ({
+    question,
+    currentQuestionNumber,
+  }: {
+    question: {
+      id: number;
+      category_id: number;
+      question_id: number;
+      question: QuestionT;
+    };
+    currentQuestionNumber: number;
+  }) => void;
   joinGameError: (errorMessage: string) => void;
   onlineUsersCount: (count: number) => void;
   userPoints: (points: number) => void;
   gameEnded: () => void;
   playersInGame: (players: UserT[]) => void;
-  fistQuestionTimerExpired: () => void;
+  firstQuestionTimerExpired: () => void;
   questionTimerExpired: () => void;
   scoreBoard: (scores: any[]) => void;
 }
