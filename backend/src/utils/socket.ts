@@ -50,6 +50,8 @@ export function initializeSocketIO(server: any) {
       io.to(socketId).emit("gameEnded");
     });
   }
+  let questionTime: NodeJS.Timeout;
+  let answerTime: NodeJS.Timeout;
 
   const sendQuestion = async (socketId: string, gameId: number) => {
     try {
@@ -59,12 +61,16 @@ export function initializeSocketIO(server: any) {
         if (questions && questions.length > currentQuestionIndex) {
           const question = questions[currentQuestionIndex];
 
-          io.to(socketId).emit("nextQuestion", question);
-          const questionTimer = setTimeout(() => {
-            io.to(socketId).emit("questionExpired");
-            sendQuestion(socketId, gameId);
-          }, 5 * 1000);
-          io.to(socketId).emit("questionTimerExpired");
+          questionTime = setTimeout(() => {
+            io.to(socketId).emit("nextQuestion", {
+              question,
+              currentQuestionIndex,
+            });
+            answerTime = setTimeout(async () => {
+              io.to(socketId).emit("questionTimerExpired");
+            }, 5000);
+          }, 5000);
+
           currentQuestionIndex++;
         }
       } else {
@@ -129,9 +135,7 @@ export function initializeSocketIO(server: any) {
             io.to(game.socket_id).emit("gameStartCountdown");
             io.to(game.socket_id).emit("playersInGame", players);
 
-            setTimeout(() => {
-              sendQuestion(game.socket_id, game.id);
-            }, 5000);
+            sendQuestion(game.socket_id, game.id);
           }
         }
       } catch (error) {
@@ -141,6 +145,8 @@ export function initializeSocketIO(server: any) {
 
     socket.on("answer", async (userId: number, answerId: number) => {
       try {
+        clearTimeout(answerTime);
+        clearTimeout(questionTime);
         const { socketId, gameId } = await findGameDataByUserId(userId);
         const isCorrect = await findAnswerById(answerId);
         clearTimeout(questionTimer);
