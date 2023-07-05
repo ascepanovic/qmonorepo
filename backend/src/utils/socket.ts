@@ -20,6 +20,7 @@ dotenv.config();
 const maxPlayers = process.env.MAX_PLAYERS || 2;
 const gameDuration = parseInt(`${process.env.GAME_DURATION}`) || 60;
 const questionTimer = parseInt(`${process.env.QUESTION_TIMER}`) || 5;
+
 let currentQuestionIndex;
 let maxQuestions = 2;
 let isAnswered = false;
@@ -68,18 +69,18 @@ export function initializeSocketIO(server: any) {
               question,
               currentQuestionIndex,
             });
+            currentQuestionIndex++;
+            isAnswered = false;
             answerTime = setTimeout(async () => {
               io.to(socketId).emit("questionTimerExpired");
-            }, 5000);
-          }, 5000);
-
-          currentQuestionIndex++;
+              sendQuestion(socketId, gameId);
+            }, questionTimer * 1000);
+          }, questionTimer * 1000);
         }
       } else {
         io.to(socketId).emit("noMoreQuestions");
-        startTimer(3000, () => {
-          endGame(gameId, socketId, io);
-        });
+
+        endGame(gameId, socketId, io);
       }
     } catch (error) {
       console.error(`Failed to send question: ${error}`);
@@ -87,8 +88,6 @@ export function initializeSocketIO(server: any) {
   };
 
   io.on("connection", (socket) => {
-    console.log(`Socket connected: ${socket.id}`);
-
     socket.on("createGame", async (payload) => {
       try {
         const { userId, categoryId } = payload;
@@ -162,16 +161,8 @@ export function initializeSocketIO(server: any) {
             });
             await userAnswer(answerId, isCorrect, gameId, userId);
             await updateScore(gameId, userId, isCorrect);
-          } else {
-            io.to(socketId).emit("answerResult", {
-              userId,
-              isCorrect,
-            });
-            await userAnswer(answerId, isCorrect, gameId, userId);
-            await updateScore(gameId, userId, isCorrect);
+            sendQuestion(socketId, gameId);
           }
-
-          sendQuestion(socketId, gameId);
         }
       } catch (error) {
         console.error(`Failed to process answer: ${error}`);
