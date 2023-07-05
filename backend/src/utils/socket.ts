@@ -69,7 +69,9 @@ export function initializeSocketIO(server: any) {
         }
       } else {
         io.to(socketId).emit("noMoreQuestions");
-        endGame(gameId, socketId, io);
+        startTimer(3000, () => {
+          endGame(gameId, socketId, io);
+        });
       }
     } catch (error) {
       console.error(`Failed to send question: ${error}`);
@@ -127,7 +129,9 @@ export function initializeSocketIO(server: any) {
             io.to(game.socket_id).emit("gameStartCountdown");
             io.to(game.socket_id).emit("playersInGame", players);
 
-            sendQuestion(game.socket_id, game.id);
+            setTimeout(() => {
+              sendQuestion(game.socket_id, game.id);
+            }, 5000);
           }
         }
       } catch (error) {
