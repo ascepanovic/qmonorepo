@@ -22,6 +22,7 @@ const gameDuration = parseInt(`${process.env.GAME_DURATION}`) || 60;
 const questionTimer = parseInt(`${process.env.QUESTION_TIMER}`) || 5;
 let currentQuestionIndex;
 let maxQuestions = 2;
+let isAnswered = false;
 
 export function initializeSocketIO(server: any) {
   const io = new Server(server, {
@@ -61,6 +62,7 @@ export function initializeSocketIO(server: any) {
         if (questions && questions.length > currentQuestionIndex) {
           const question = questions[currentQuestionIndex];
 
+          isAnswered = false;
           questionTime = setTimeout(() => {
             io.to(socketId).emit("nextQuestion", {
               question,
@@ -145,13 +147,15 @@ export function initializeSocketIO(server: any) {
 
     socket.on("answer", async (userId: number, answerId: number) => {
       try {
-        clearTimeout(answerTime);
-        clearTimeout(questionTime);
         const { socketId, gameId } = await findGameDataByUserId(userId);
         const isCorrect = await findAnswerById(answerId);
-        clearTimeout(questionTimer);
+
+        if (isAnswered) return;
         if (gameId && socketId) {
           if (isCorrect) {
+            isAnswered = true;
+            clearTimeout(answerTime);
+            clearTimeout(questionTime);
             io.to(socketId).emit("answerResult", {
               userId,
               isCorrect,
