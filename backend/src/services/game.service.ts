@@ -54,7 +54,7 @@ export async function getPlayersScore(gameId: number) {
     include: {
       user: {
         include: {
-          games: true,
+          games: false,
         },
       },
     },
