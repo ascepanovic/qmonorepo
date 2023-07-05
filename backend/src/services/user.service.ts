@@ -92,6 +92,7 @@ export async function getUserPoints(userId: number): Promise<number> {
     throw new Error("User not found");
   }
 }
+
 export async function checkUserGameStatus(userId: number) {
   const game = await prisma.games.findFirst({
     where: {

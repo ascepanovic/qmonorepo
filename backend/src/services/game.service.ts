@@ -52,14 +52,22 @@ export async function getPlayersScore(gameId: number) {
       game_id: gameId,
     },
     include: {
-      user: true,
+      user: {
+        include: {
+          games: true,
+        },
+      },
     },
     orderBy: {
       points: "desc",
     },
   });
-
-  return players.map((e) => e.user);
+  console.log();
+  return players.map((e) => ({
+    points: e.points,
+    user: e.user,
+    won: e.has_won,
+  }));
 }
 
 export async function create(
