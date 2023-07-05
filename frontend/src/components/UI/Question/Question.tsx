@@ -11,21 +11,29 @@ export const Question = () => {
   const { notify } = useNotificationContext();
   const [disabled, setDisabled] = useState(false);
   const [question, setQuestion] = useState<QuestionT>();
+  const [gameId, setGameId] = useState("");
 
   const handleAnswer = (id: number) => {
     setDisabled(true);
-    socket.emit("answer", user!.id, id);
+    socket.emit("answer", user!.id, id, gameId);
     socket.emit("getUserPoints", user!.id);
   };
 
   const nextQuestionHandler: ServerToClientEvents["nextQuestion"] = ({
     question,
+    gameId,
   }) => {
     setDisabled(false);
     setQuestion(question.question);
+    setGameId(gameId);
+  };
+
+  const answerResultHandler = () => {
+    setDisabled(true);
   };
 
   useEffect(() => {
+    socket.on("answerResult", answerResultHandler);
     socket.on("gameStarted", setQuestion);
     socket.on("nextQuestion", nextQuestionHandler);
     socket.on("timerExpired", () => {
@@ -33,6 +41,7 @@ export const Question = () => {
       return notify("Timer expired!");
     });
     return () => {
+      socket.off("answerResult", answerResultHandler);
       socket.off("gameStarted", setQuestion);
       socket.off("nextQuestion", nextQuestionHandler);
     };

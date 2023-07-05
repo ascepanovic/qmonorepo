@@ -11,6 +11,7 @@ export interface ServerToClientEvents {
   nextQuestion: ({
     question,
     currentQuestionNumber,
+    gameId,
   }: {
     question: {
       id: number;
@@ -19,6 +20,7 @@ export interface ServerToClientEvents {
       question: QuestionT;
     };
     currentQuestionNumber: number;
+    gameId: string;
   }) => void;
   joinGameError: (errorMessage: string) => void;
   onlineUsersCount: (count: number) => void;
