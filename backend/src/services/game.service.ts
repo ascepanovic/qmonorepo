@@ -141,6 +141,25 @@ export async function deleteGame(id: number) {
     where: { id },
   });
 }
+export async function getGameHistory(gameId: number) {
+  const gameHistory = await prisma.user_answers.findMany({
+    where: {
+      game: {
+        id: gameId,
+      },
+    },
+    select: {
+      question: true,
+      answer: true,
+      user: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+  return gameHistory;
+}
 export async function getWaitingGames() {
   const games = await prisma.games.findMany({
     where: { game_status: GameStatus.Waiting },

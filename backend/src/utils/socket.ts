@@ -12,6 +12,7 @@ import {
   findCategoryIdByGame,
   findGameDataByUserId,
   getPlayersScore,
+  getGameHistory,
 } from "../services/game.service";
 import { findAnswerById, userAnswer } from "../services/answer.service";
 import { getQuestionsByCategoryId } from "../services/question.service";
@@ -22,7 +23,8 @@ const gameDuration = parseInt(`${process.env.GAME_DURATION}`) || 60;
 const questionTimer = parseInt(`${process.env.QUESTION_TIMER}`) || 5;
 
 let currentQuestionIndex;
-let maxQuestions = 2;
+let maxQuestions = parseInt(`${process.env.MAX_QUESTIONS}`) || 5;
+
 let isAnswered = false;
 
 export function initializeSocketIO(server: any) {
@@ -63,7 +65,6 @@ export function initializeSocketIO(server: any) {
         if (questions && questions.length > currentQuestionIndex) {
           const question = questions[currentQuestionIndex];
 
-          isAnswered = false;
           questionTime = setTimeout(() => {
             io.to(socketId).emit("nextQuestion", {
               question,
@@ -115,6 +116,14 @@ export function initializeSocketIO(server: any) {
         console.error(`Failed to get waiting games: ${error}`);
       }
     });
+    socket.on("gameAnswers", async (gameId: number) => {
+      try {
+        const gameHistory = await getGameHistory(gameId);
+        socket.emit("gameHistory", gameHistory);
+      } catch (error) {
+        console.error(`Failed to get waiting games: ${error}`);
+      }
+    });
 
     socket.on("joinGame", async (gameId: number, userId: number) => {
       try {
@@ -146,22 +155,36 @@ export function initializeSocketIO(server: any) {
 
     socket.on("answer", async (userId: number, answerId: number) => {
       try {
-        const { socketId, gameId } = await findGameDataByUserId(userId);
-        const isCorrect = await findAnswerById(answerId);
-
         if (isAnswered) return;
-        if (gameId && socketId) {
-          if (isCorrect) {
+        const { socketId, gameId } = await findGameDataByUserId(userId);
+        const answerData = await findAnswerById(answerId);
+
+        if (gameId && socketId && answerData) {
+          if (answerData.isCorrect) {
             isAnswered = true;
             clearTimeout(answerTime);
             clearTimeout(questionTime);
-            io.to(socketId).emit("answerResult", {
-              userId,
-              isCorrect,
-            });
-            await userAnswer(answerId, isCorrect, gameId, userId);
-            await updateScore(gameId, userId, isCorrect);
+            io.to(socketId).emit("answerResult", { userId });
+
+            console.log("Correct answer ", userId, answerId);
+            await userAnswer(
+              answerData.question,
+              answerData.answer,
+              answerData.isCorrect,
+              gameId,
+              userId
+            );
+            await updateScore(gameId, userId, answerData.isCorrect);
             sendQuestion(socketId, gameId);
+          } else {
+            console.log("Wrong answer ", userId, answerId);
+            await userAnswer(
+              answerData.question,
+              answerData.answer,
+              answerData.isCorrect,
+              gameId,
+              userId
+            );
           }
         }
       } catch (error) {

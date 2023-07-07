@@ -1,4 +1,5 @@
 import { prisma } from "../utils/prisma";
+import { findById } from "./user.service";
 
 export async function create(answer: any) {
   return await prisma.answers.create({
@@ -12,14 +13,17 @@ export async function create(answer: any) {
   });
 }
 export async function userAnswer(
-  answerId: number,
+  question: string,
+  answer: string,
   isCorrect: boolean,
   gameId: number,
   userId: number
 ) {
   return await prisma.user_answers.create({
     data: {
-      answer: answerId,
+      question,
+      answer,
+
       is_correct: isCorrect,
       game_id: gameId,
       user_id: userId,
@@ -37,13 +41,21 @@ export async function findAnswerById(id: number) {
       id,
     },
     select: {
+      text: true,
       is_correct: true,
+      question: {
+        select: {
+          text: true,
+        },
+      },
     },
   });
-  if (result && result.is_correct) {
-    return result.is_correct;
-  } else {
-    return false;
+  if (result) {
+    return {
+      isCorrect: result.is_correct,
+      question: result.question.text,
+      answer: result.text,
+    };
   }
 }
 

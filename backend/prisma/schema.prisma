@@ -89,7 +89,8 @@ model users {
 }
 model user_answers {
   id           Int           @id @default(autoincrement())
-  answer       Int?
+  question     String?
+  answer       String?
   is_correct   Boolean
   game_id     Int?      @map("game_id")
   user_id     Int?      @map("user_id")
