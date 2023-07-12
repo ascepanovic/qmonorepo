@@ -12,7 +12,6 @@ import {
   findCategoryIdByGame,
   findGameDataByUserId,
   getPlayersScore,
-  getGameHistory,
 } from "../services/game.service";
 import { findAnswerById, userAnswer } from "../services/answer.service";
 import { getQuestionsByCategoryId } from "../services/question.service";
@@ -116,14 +115,6 @@ export function initializeSocketIO(server: any) {
         console.error(`Failed to get waiting games: ${error}`);
       }
     });
-    socket.on("gameAnswers", async (gameId: number) => {
-      try {
-        const gameHistory = await getGameHistory(gameId);
-        socket.emit("gameHistory", gameHistory);
-      } catch (error) {
-        console.error(`Failed to get waiting games: ${error}`);
-      }
-    });
 
     socket.on("joinGame", async (gameId: number, userId: number) => {
       try {
@@ -167,7 +158,7 @@ export function initializeSocketIO(server: any) {
             io.to(socketId).emit("answerResult", { userId });
 
             console.log("Correct answer ", userId, answerId);
-            await userAnswer(
+            const answer = await userAnswer(
               answerData.question,
               answerData.answer,
               answerData.isCorrect,
@@ -176,15 +167,17 @@ export function initializeSocketIO(server: any) {
             );
             await updateScore(gameId, userId, answerData.isCorrect);
             sendQuestion(socketId, gameId);
+            io.to(socketId).emit("gameHistory", answer);
           } else {
             console.log("Wrong answer ", userId, answerId);
-            await userAnswer(
+            const answer = await userAnswer(
               answerData.question,
               answerData.answer,
               answerData.isCorrect,
               gameId,
               userId
             );
+            io.to(socketId).emit("gameHistory", answer);
           }
         }
       } catch (error) {

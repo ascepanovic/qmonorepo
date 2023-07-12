@@ -1,4 +1,5 @@
 import { prisma } from "../utils/prisma";
+import { getGameHistory } from "./game.service";
 import { findById } from "./user.service";
 
 export async function create(answer: any) {
@@ -19,7 +20,7 @@ export async function userAnswer(
   gameId: number,
   userId: number
 ) {
-  return await prisma.user_answers.create({
+  await prisma.user_answers.create({
     data: {
       question,
       answer,
@@ -29,6 +30,8 @@ export async function userAnswer(
       user_id: userId,
     },
   });
+  const gameHistory = await getGameHistory(gameId);
+  return gameHistory;
 }
 export async function findAll() {
   return await prisma.answers.findMany({
