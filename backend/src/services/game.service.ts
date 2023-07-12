@@ -142,26 +142,16 @@ export async function deleteGame(id: number) {
   });
 }
 export async function getGameHistory(gameId: number) {
-  const gameHistory = await prisma.user_answers.findMany({
-    where: {
-      game: {
-        id: gameId,
-      },
-    },
-    orderBy: {
-      question: "asc",
-    },
-    select: {
-      question: true,
-      answer: true,
-      is_correct: true,
-      user: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
+  const gameHistory = await prisma.$queryRaw`
+  SELECT question, 
+         JSON_ARRAYAGG(answer) as answers, 
+         JSON_ARRAYAGG(is_correct) as is_correct, 
+         JSON_ARRAYAGG(users.name) as names
+  FROM user_answers
+  LEFT JOIN users ON user_answers.user_id = users.id
+  WHERE user_answers.game_id = ${gameId}
+  GROUP BY question;
+`;
 
   return gameHistory;
 }

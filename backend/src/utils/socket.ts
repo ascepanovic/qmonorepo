@@ -157,7 +157,6 @@ export function initializeSocketIO(server: any) {
             clearTimeout(questionTime);
             io.to(socketId).emit("answerResult", { userId });
 
-            console.log("Correct answer ", userId, answerId);
             const answer = await userAnswer(
               answerData.question,
               answerData.answer,
@@ -169,7 +168,6 @@ export function initializeSocketIO(server: any) {
             sendQuestion(socketId, gameId);
             io.to(socketId).emit("gameHistory", answer);
           } else {
-            console.log("Wrong answer ", userId, answerId);
             const answer = await userAnswer(
               answerData.question,
               answerData.answer,
@@ -177,6 +175,7 @@ export function initializeSocketIO(server: any) {
               gameId,
               userId
             );
+
             io.to(socketId).emit("gameHistory", answer);
           }
         }
