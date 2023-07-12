@@ -148,8 +148,9 @@ export async function getGameHistory(gameId: number) {
         id: gameId,
       },
     },
-    distinct: ["question"],
-
+    orderBy: {
+      question: "asc",
+    },
     select: {
       question: true,
       answer: true,
@@ -160,7 +161,22 @@ export async function getGameHistory(gameId: number) {
         },
       },
     },
-  });
+    groupBy: {
+      question: {
+        select: {
+          question: true,
+          answer: true,
+          is_correct: true,
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  } as any);
+
   return gameHistory;
 }
 export async function getWaitingGames() {
