@@ -151,6 +151,7 @@ export async function getGameHistory(gameId: number) {
     select: {
       question: true,
       answer: true,
+      is_correct: true,
       user: {
         select: {
           name: true,
