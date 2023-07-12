@@ -148,6 +148,10 @@ export async function getGameHistory(gameId: number) {
         id: gameId,
       },
     },
+
+    orderBy: {
+      question: "asc",
+    },
     select: {
       question: true,
       answer: true,
