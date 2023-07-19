@@ -1,40 +1,30 @@
-import { QuestionT, UserT, WaitingGameT } from ".";
+import {
+  GameHistoryT,
+  GameResultT,
+  NextQuestionT,
+  QuestionT,
+  UserT,
+  WaitingGameT,
+} from ".";
 
 export interface ServerToClientEvents {
-  gameCreated: (gameId: string) => void;
-  waitingGames: (games: WaitingGameT[]) => void;
-  playerJoined: (userId: number) => void;
-  gameStarted: (question: QuestionT) => void;
+  gameCreated: (data: string) => void;
+  waitingGames: (data: WaitingGameT[]) => void;
+  playerJoined: (data: number) => void;
+  gameStarted: (data: QuestionT) => void;
   gameStartCountdown: () => void;
   timerExpired: () => void;
-  answerResult: (result: { userId: number }) => void;
-  nextQuestion: (data: {
-    question: {
-      id: number;
-      category_id: number;
-      question_id: number;
-      question: QuestionT;
-    };
-    currentQuestionIndex: number;
-  }) => void;
-  joinGameError: (errorMessage: string) => void;
-  onlineUsersCount: (count: number) => void;
-  userPoints: (points: number) => void;
+  answerResult: (data: { userId: number }) => void;
+  nextQuestion: (data: NextQuestionT) => void;
+  joinGameError: (data: string) => void;
+  onlineUsersCount: (data: number) => void;
+  userPoints: (data: number) => void;
   gameEnded: () => void;
-  playersInGame: (players: UserT[]) => void;
+  playersInGame: (data: UserT[]) => void;
   firstQuestionTimerExpired: () => void;
   questionTimerExpired: () => void;
-  scoreBoard: (data: { points: number; user: UserT; won: boolean }[]) => void;
-  gameHistory: (
-    gameHistory: {
-      question: string;
-      answer: string;
-      is_correct: boolean;
-      user: {
-        name: string;
-      };
-    }[],
-  ) => void;
+  scoreBoard: (data: GameResultT[]) => void;
+  gameHistory: (data: GameHistoryT[]) => void;
 }
 
 export interface ClientToServerEvents {

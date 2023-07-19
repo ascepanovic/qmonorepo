@@ -3,20 +3,18 @@ import { useEffect, useState } from "react";
 import { socket } from "@/lib/socket";
 import { UserT } from "@/types";
 
-export type RoomUserCardProps = { user: UserT; points: number };
+export type RoomUserCardProps = { user: UserT };
 
-export const RoomUserCard = ({ user, points }: RoomUserCardProps) => {
+export const RoomUserCard = ({ user }: RoomUserCardProps) => {
   const [open, setOpen] = useState(false);
   const [display, setDisplay] = useState(false);
+  const [points, setPoints] = useState(0);
 
-  const answerResultHandler = ({
-    userId,
-    isCorrect,
-  }: {
-    userId: number;
-    isCorrect: boolean;
-  }) => {
-    if (userId === user.id && isCorrect) setDisplay(true);
+  const answerResultHandler = ({ userId }: { userId: number }) => {
+    if (userId === user.id) {
+      setPoints((prev) => prev + 1);
+      setDisplay(true);
+    }
     setTimeout(() => {
       setDisplay(false);
     }, 2000);

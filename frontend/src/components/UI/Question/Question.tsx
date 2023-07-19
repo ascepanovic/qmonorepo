@@ -28,6 +28,7 @@ export const Question = () => {
   useEffect(() => {
     socket.on("gameStarted", setQuestion);
     socket.on("nextQuestion", nextQuestionHandler);
+    socket.on("answerResult", () => setDisabled(true));
     socket.on("timerExpired", () => {
       setDisabled(true);
       return notify("Timer expired!");
@@ -35,13 +36,15 @@ export const Question = () => {
     return () => {
       socket.off("gameStarted", setQuestion);
       socket.off("nextQuestion", nextQuestionHandler);
+      socket.off("answerResult");
+      socket.off("timerExpired");
     };
   }, []);
 
   return (
     <section
       className="z-10 flex flex-col
-   items-center gap-20 pt-40"
+items-center gap-20 pt-40"
     >
       {question ? (
         <>

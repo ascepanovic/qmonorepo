@@ -11,7 +11,7 @@ import Second from "@/assets/images/prize/2nd-prize-icon.svg";
 import Third from "@/assets/images/prize/3rd-prize-icon.svg";
 import { ROUTES } from "@/constants";
 import { socket } from "@/lib/socket";
-import { ResultItemT } from "@/types";
+import { GameResultT } from "@/types";
 
 const PRIZE = [
   { classes: "", photo: First, color: "gold" },
@@ -21,7 +21,7 @@ const PRIZE = [
 
 export const Results = () => {
   const navigate = useNavigate();
-  const [data, setData] = useState<ResultItemT[]>([]);
+  const [data, setData] = useState<GameResultT[]>([]);
 
   useEffect(() => {
     socket.on("scoreBoard", setData);

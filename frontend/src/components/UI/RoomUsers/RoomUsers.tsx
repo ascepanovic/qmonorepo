@@ -1,28 +1,24 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 import { RoomUserCard } from "./RoomUserCard";
 
 import { socket } from "@/lib/socket";
 import { UserT } from "@/types";
 
-export type RoomUsersProps = {
-  users: UserT[];
-};
+export const RoomUsers = () => {
+  const [users, setUsers] = useState<UserT[]>([]);
 
-export const RoomUsers = ({ users }: RoomUsersProps) => {
-  const [points, setPoints] = useState(0);
   useEffect(() => {
-    if (users.length) socket.emit("getUserPoints", users[0].id);
-    socket.on("userPoints", setPoints);
-    return () => {
-      socket.off("userPoints", setPoints);
-    };
-  }, [users]);
+    socket.on("playersInGame", setUsers);
 
+    return () => {
+      socket.off("playersInGame");
+    };
+  }, []);
   return (
     <section className="mt-4 flex w-full justify-evenly">
       {users.map((user, i) => (
-        <RoomUserCard user={user} points={points} key={i} />
+        <RoomUserCard user={user} key={i} />
       ))}
     </section>
   );
