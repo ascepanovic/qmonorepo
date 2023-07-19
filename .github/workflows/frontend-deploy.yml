@@ -1,4 +1,4 @@
-name: Frontend Deploy to EC2
+name: Frontend deploy
 on:
   push:
     branches:
@@ -9,21 +9,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Build React frontend
-        working-directory: ./frontend
-        run: npm i && npm run build
-      - name: Deploy to EC2
+      - name: Build
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_INSTANCE_IP }}
-          username: ${{ secrets.EC2_SSH_USERNAME }}
+          host: ${{ secrets.EC2_BUILD_INSTANCE_IP }}
+          username: ${{ secrets.EC2_BUILD_SSH_USERNAME }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/qmonorepo
-            git restore frontend/package-lock.json
+            cd ~/qmonorepo
+            git reset --hard
             git pull
             cd ./frontend
             npm install
-            pm2 restart 1
+            npm run build
+            scp \
+              -i ~/server.pem \ 
+              -r dist \
+              ${{ secrets.EC2_SERVE_SSH_USERNAME }}@${{ secrets.EC2_SERVE_INSTANCE_IP }}:~/qmonorepo/frontend
+      - name: Restart pm2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_SERVE_INSTANCE_IP }}
+          username: ${{ secrets.EC2_SERVE_SSH_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            pm2 restart --name FE
