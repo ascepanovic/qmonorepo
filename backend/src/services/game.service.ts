@@ -143,18 +143,25 @@ export async function deleteGame(id: number) {
 }
 export async function getGameHistory(gameId: number) {
   const gameHistory = await prisma.$queryRaw`
-  SELECT question, 
-         JSON_ARRAYAGG(answer) as answers, 
-         JSON_ARRAYAGG(is_correct) as is_correct, 
-         JSON_ARRAYAGG(users.name) as names
-  FROM user_answers
-  LEFT JOIN users ON user_answers.user_id = users.id
-  WHERE user_answers.game_id = ${gameId}
-  GROUP BY question
-  ORDER BY user_answers.id ASC;
+  SELECT 
+    question, 
+    JSON_ARRAYAGG(answer) AS answers, 
+    JSON_ARRAYAGG(is_correct) AS is_correct, 
+    JSON_ARRAYAGG(users.name) AS names
+FROM 
+    user_answers
+LEFT JOIN 
+    users ON user_answers.user_id = users.id
+WHERE 
+    user_answers.game_id = ${gameId}
+GROUP BY 
+    question
+ORDER BY 
+    MIN(user_answers.id) ASC;
+
 
 `;
-
+  console.log(gameHistory);
   return gameHistory;
 }
 export async function getWaitingGames() {
