@@ -158,10 +158,7 @@ GROUP BY
     question
 ORDER BY 
     MIN(user_answers.id) ASC;
-
-
 `;
-  console.log(gameHistory);
   return gameHistory;
 }
 export async function getWaitingGames() {
