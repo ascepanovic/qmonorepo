@@ -21,7 +21,6 @@ const maxPlayers = process.env.MAX_PLAYERS || 2;
 const gameDuration = parseInt(`${process.env.GAME_DURATION}`) || 60;
 const questionTimer = parseInt(`${process.env.QUESTION_TIMER}`) || 5;
 
-let currentQuestionIndex;
 let maxQuestions = parseInt(`${process.env.MAX_QUESTIONS}`) || 5;
 
 let isAnswered = false;

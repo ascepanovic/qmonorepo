@@ -150,7 +150,9 @@ export async function getGameHistory(gameId: number) {
   FROM user_answers
   LEFT JOIN users ON user_answers.user_id = users.id
   WHERE user_answers.game_id = ${gameId}
-  GROUP BY question;
+  GROUP BY question
+  ORDER BY user_answers.id ASC;
+
 `;
 
   return gameHistory;
