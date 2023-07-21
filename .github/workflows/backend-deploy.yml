@@ -1,4 +1,4 @@
-name: Backend Deploy to EC2
+name: Backend Deploy
 on:
   push:
     branches:
@@ -9,23 +9,30 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Install Node.js dependencies
-        working-directory: ./backend
-        run: npm i
-      - name: Deploy to EC2
+      - name: Build
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_INSTANCE_IP }}
-          username: ${{ secrets.EC2_SSH_USERNAME }}
+          host: ${{ secrets.EC2_BUILD_INSTANCE_IP }}
+          username: ${{ secrets.EC2_BUILD_SSH_USERNAME }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/qmonorepo
-            pm2 stop 2
-            git restore backend/package-lock.json
+            cd ~/qmonorepo
+            git reset --hard
             git pull
             cd ./backend
-            npm run db:migrate
             npm install
-            pm2 start 2
+            npm run build
+            scp \
+              -i ~/server.pem \
+              -r dist \
+              ${{ secrets.EC2_SERVE_SSH_USERNAME }}@${{ secrets.EC2_SERVE_INSTANCE_IP }}:~/qmonorepo/backend
+      - name: Restart pm2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_SERVE_INSTANCE_IP }}
+          username: ${{ secrets.EC2_SERVE_SSH_USERNAME }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            ~/qmonorepo/backend
+            npm run db:migrate
+            pm2 restart --name BE
