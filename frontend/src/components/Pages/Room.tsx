@@ -1,24 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
+import { GameHistory } from "../UI/GameHistory";
 import { Question } from "../UI/Question";
+import { Results } from "../UI/Results";
 import { RoomUsers } from "../UI/RoomUsers";
+import { StartTimer, Timer } from "../UI/Timer";
 
-import { socket } from "@/lib/socket";
-import { UserT } from "@/types";
-
-export const Room = () => {
-  const [users, setUsers] = useState<UserT[]>([]);
-  const navigate = useNavigate();
-  useEffect(() => {
-    socket.on("gameEnded", () => navigate("/"));
-    socket.on("playersInGame", setUsers);
-  }, []);
-
-  return (
-    <>
-      <RoomUsers users={users} />
-      <Question />
-    </>
-  );
-};
+export const Room = () => (
+  <>
+    <Timer />
+    <RoomUsers />
+    <Question />
+    <GameHistory />
+    <Results />
+    <StartTimer />
+  </>
+);

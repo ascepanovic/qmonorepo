@@ -3,7 +3,8 @@ import { ReactNode } from "react";
 export type ModalProps = {
   visible: boolean;
   setVisibility: (value: boolean) => void;
-  title: ReactNode;
+  title?: ReactNode;
+  header?: ReactNode;
   body: ReactNode;
   submitHandler?: () => void;
   submitText?: ReactNode;
@@ -16,7 +17,24 @@ export const Modal = ({
   body,
   submitHandler,
   submitText,
+  header,
 }: ModalProps) => {
+  const Header = () =>
+    header ? (
+      header
+    ) : (
+      <div className="flex items-start justify-between rounded-t border-b border-solid border-main p-5 px-10">
+        <h3 className="text-2xl ">{title || ""}</h3>
+        <button
+          className="border-1
+        float-right  text-2xl  transition-colors ease-in-out  hover:text-main"
+          onClick={() => setVisibility(false)}
+        >
+          X
+        </button>
+      </div>
+    );
+
   return (
     <>
       <div
@@ -26,18 +44,10 @@ export const Modal = ({
       >
         <div className="mx-auto my-6 w-96 rounded-lg bg-main-bg shadow-[0_0_20px_10px_#2AE78B]">
           {/*content*/}
-          <div className="bg-white  flex w-full flex-col rounded-lg border-0 shadow-lg outline-none focus:outline-none">
+          <div className="bg-white    flex w-full flex-col rounded-lg border-0 shadow-lg outline-none focus:outline-none">
             {/*header*/}
-            <div className="flex items-start justify-between rounded-t border-b border-solid border-main p-5 px-10">
-              <h3 className="text-2xl ">{title}</h3>
-              <button
-                className="border-1
-                    float-right  text-2xl  transition-colors ease-in-out  hover:text-main"
-                onClick={() => setVisibility(false)}
-              >
-                X
-              </button>
-            </div>
+
+            <Header />
             {/*body*/}
             <div className="flex-auto p-6">{body}</div>
             {/*footer*/}

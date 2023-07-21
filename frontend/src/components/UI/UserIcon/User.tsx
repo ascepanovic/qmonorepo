@@ -4,6 +4,7 @@ import { FaUserAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 import { auth } from "@/api";
+import { ROUTES } from "@/constants";
 import { useAuthContext } from "@/context";
 
 export const User = () => {
@@ -41,7 +42,7 @@ export const User = () => {
               <Link
                 className="flex gap-2 rounded-lg px-4 py-2 hover:bg-main-bg hover:text-main"
                 onClick={toggleMenu}
-                to={"/profile"}
+                to={ROUTES.PROFILE}
               >
                 profile
                 <span>
@@ -51,7 +52,7 @@ export const User = () => {
             </li>
             <li>
               <Link
-                to="/"
+                to={ROUTES.INDEX}
                 className="flex gap-2 rounded-lg px-4 py-2 hover:bg-main-bg hover:text-main"
                 onClick={logoutHandler}
               >

@@ -1,4 +1,4 @@
-import { ENDPOINTS } from "@/constants/Endpoints";
+import { ENDPOINTS } from "@/constants";
 import { http } from "@/lib/axios";
 import { CategoryT } from "@/types";
 

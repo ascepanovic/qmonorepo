@@ -1,24 +1,36 @@
-import { QuestionT, UserT, WaitingGameT } from ".";
+import {
+  GameHistoryT,
+  GameResultT,
+  NextQuestionT,
+  QuestionT,
+  UserT,
+  WaitingGameT,
+} from ".";
 
 export interface ServerToClientEvents {
-  gameCreated: (gameId: string) => void;
-  waitingGames: (games: WaitingGameT[]) => void;
-  playerJoined: (userId: number) => void;
-  gameStarted: (question: QuestionT) => void;
+  gameCreated: (data: string) => void;
+  waitingGames: (data: WaitingGameT[]) => void;
+  playerJoined: (data: number) => void;
+  gameStarted: (data: QuestionT) => void;
+  gameStartCountdown: () => void;
   timerExpired: () => void;
-  answerResult: (result: { userId: number; isCorrect: boolean }) => void;
-  nextQuestion: (question: QuestionT) => void;
-  joinGameError: (errorMessage: string) => void;
-  onlineUsersCount: (count: number) => void;
-  userPoints: (points: number) => void;
+  answerResult: (data: { userId: number }) => void;
+  nextQuestion: (data: NextQuestionT) => void;
+  joinGameError: (data: string) => void;
+  onlineUsersCount: (data: number) => void;
+  userPoints: (data: number) => void;
   gameEnded: () => void;
-  playersInGame: (players: UserT[]) => void;
+  playersInGame: (data: UserT[]) => void;
+  firstQuestionTimerExpired: () => void;
+  questionTimerExpired: () => void;
+  scoreBoard: (data: GameResultT[]) => void;
+  gameHistory: (data: GameHistoryT[]) => void;
 }
 
 export interface ClientToServerEvents {
   createGame: (payload: { userId: number; categoryId: number }) => void;
   getWaitingGames: () => void;
-  joinGame: (gameId: number, userId: number) => void;
+  joinGame: (gameId: string, userId: number) => void;
   answer: (userId: number, answerId: number) => void;
   getOnlineUsers: () => void;
   getUserPoints: (userId: number) => void;
