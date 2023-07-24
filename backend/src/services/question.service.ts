@@ -92,3 +92,20 @@ export async function getRandomQuestion(categoryId: number) {
     questions[Math.floor(Math.random() * questions.length)];
   return randomQuestion;
 }
+export async function getQuestionsByCategoryId(categoryId: number) {
+  const result = await prisma.category.findUnique({
+    where: { id: categoryId },
+    include: {
+      questions: {
+        include: {
+          question: {
+            include: {
+              answers: true,
+            },
+          },
+        },
+      },
+    },
+  });
+  if (result) return result.questions;
+}

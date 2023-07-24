@@ -1,4 +1,6 @@
 import { prisma } from "../utils/prisma";
+import { getGameHistory } from "./game.service";
+import { findById } from "./user.service";
 
 export async function create(answer: any) {
   return await prisma.answers.create({
@@ -11,21 +13,55 @@ export async function create(answer: any) {
     },
   });
 }
+export async function userAnswer(
+  question: string,
+  answer: string,
+  isCorrect: boolean,
+  gameId: number,
+  userId: number
+) {
+  await prisma.user_answers.create({
+    data: {
+      question,
+      answer,
+
+      is_correct: isCorrect,
+      game_id: gameId,
+      user_id: userId,
+    },
+  });
+  const gameHistory = await getGameHistory(gameId);
+  return gameHistory;
+}
 export async function findAll() {
   return await prisma.answers.findMany({
     include: { question: true },
   });
 }
 export async function findAnswerById(id: number) {
-  return await prisma.answers.findUnique({
+  const result = await prisma.answers.findUnique({
     where: {
       id,
     },
-    include: {
-      question: true,
+    select: {
+      text: true,
+      is_correct: true,
+      question: {
+        select: {
+          text: true,
+        },
+      },
     },
   });
+  if (result) {
+    return {
+      isCorrect: result.is_correct,
+      question: result.question.text,
+      answer: result.text,
+    };
+  }
 }
+
 export async function update(id: number, answer: any) {
   const existingAnswer = await prisma.answers.findUnique({
     where: { id },

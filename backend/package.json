@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --exec ts-node src/app.ts",
-    "start": "node dist/app.js",
+    "start": "node dist/src/app.js",
     "build": "tsc -p .",
     "db:migrate": "npx prisma migrate dev --name init",
     "db:generate": "npx prisma generate",
@@ -40,7 +40,7 @@
     "jsonwebtoken": "^9.0.0",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
-    "socket.io": "^4.6.1",
+    "socket.io": "^4.7.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.6.3",
     "ts-node": "^10.9.1"

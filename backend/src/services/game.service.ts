@@ -46,6 +46,29 @@ export async function getPlayersInGame(gameId: number) {
 
   return players.map((e) => e.user);
 }
+export async function getPlayersScore(gameId: number) {
+  const players = await prisma.games_by_user.findMany({
+    where: {
+      game_id: gameId,
+    },
+    include: {
+      user: {
+        include: {
+          games: false,
+        },
+      },
+    },
+    orderBy: {
+      points: "desc",
+    },
+  });
+  console.log();
+  return players.map((e) => ({
+    points: e.points,
+    user: e.user,
+    won: e.has_won,
+  }));
+}
 
 export async function create(
   socket_id: string,
@@ -118,6 +141,26 @@ export async function deleteGame(id: number) {
     where: { id },
   });
 }
+export async function getGameHistory(gameId: number) {
+  const gameHistory = await prisma.$queryRaw`
+  SELECT 
+    question, 
+    JSON_ARRAYAGG(answer) AS answers, 
+    JSON_ARRAYAGG(is_correct) AS is_correct, 
+    JSON_ARRAYAGG(users.name) AS names
+FROM 
+    user_answers
+LEFT JOIN 
+    users ON user_answers.user_id = users.id
+WHERE 
+    user_answers.game_id = ${gameId}
+GROUP BY 
+    question
+ORDER BY 
+    MIN(user_answers.id) ASC;
+`;
+  return gameHistory;
+}
 export async function getWaitingGames() {
   const games = await prisma.games.findMany({
     where: { game_status: GameStatus.Waiting },
@@ -135,7 +178,7 @@ export async function getWaitingGames() {
     },
   });
   const waitingGamesWithPlayerCount = games.map((game) => ({
-    id: game.socket_id,
+    id: game.id,
     category: game.categories.map((e) => e.category?.name)[0],
     playerCount: game.game_users.map((e) => e.user).length,
   }));
